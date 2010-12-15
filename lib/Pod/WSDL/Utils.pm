@@ -57,7 +57,7 @@ $XSD_STANDARD_TYPE_MAP{$_} = 1 for qw(
 	string
 	normalizedString
 	token
-	anyUri  
+	anyURI  
 	language
 	Name
 	QName

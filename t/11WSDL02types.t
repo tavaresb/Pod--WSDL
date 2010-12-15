@@ -16,7 +16,7 @@ my @xsdTypes = qw(
 	string
 	normalizedString
 	token
-	anyUri  
+	anyURI  
 	language
 	Name
 	QName

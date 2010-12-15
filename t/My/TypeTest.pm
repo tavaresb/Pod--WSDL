@@ -7,7 +7,7 @@ _IN blaanySimpleType           $anySimpleType          is a anySimpleType
 _IN blastring                  $string                 is a string                      
 _IN blanormalizedString        $normalizedString       is a normalizedString      
 _IN blatoken                   $token                  is a token                      
-_IN blaanyUri                  $anyUri                 is a anyUri                      
+_IN blaanyURI                  $anyURI                 is a anyURI                      
 _IN blalanguage                $language               is a language              
 _IN blaName                    $Name                   is a Name                      
 _IN blaQName                   $QName                  is a QName                      
