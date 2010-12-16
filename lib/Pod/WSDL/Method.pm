@@ -109,7 +109,10 @@ sub writePortTypeOperation {
 	my $inputName  = $name . $REQUEST_SUFFIX_NAME;
 	my $outputName = $name . $RESPONSE_SUFFIX_NAME;
 
-	$me->writer->wrElem($START_PREFIX_NAME, 'wsdl:operation', name => $name, parameterOrder => ($paramOrder ? $paramOrder : ""));
+    my %op_args = ( name => $name);
+    $op_args{parameterOrder} = $paramOrder if $paramOrder;
+
+	$me->writer->wrElem($START_PREFIX_NAME, 'wsdl:operation', %op_args);
 	$me->writer->wrDoc($me->doc->descr);
 	$me->writer->wrElem($EMPTY_PREFIX_NAME, 'wsdl:input', message => "$IMPL_NS_DECL:$inputName", name => $inputName);
 	
