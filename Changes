@@ -41,3 +41,11 @@ Revision history for Perl extension Pod::WSDL.
 			  =cut
 			  or perhaps at instatiation with a 'baseName' option?
 	
+0.05.2  Fri Dec 17 12:16:00 GMT 2010
+    - BMAVT BUG fix: https://rt.cpan.org/Public/Bug/Display.html?id=28931
+            Fix anyUri to anyURI
+    - JCOP BUG fix: https://rt.cpan.org/Ticket/Display.html?id=51447
+            Spelling mistakes
+    - JCOP BUG fix: https://rt.cpan.org/Ticket/Display.html?id=25161
+            Ommit parameterOrder if method has no params as parameterOrder is optional:
+                http://www.w3.org/TR/wsdl#_parameter
