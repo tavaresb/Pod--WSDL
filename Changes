@@ -49,3 +49,6 @@ Revision history for Perl extension Pod::WSDL.
     - JCOP BUG fix: https://rt.cpan.org/Ticket/Display.html?id=25161
             Ommit parameterOrder if method has no params as parameterOrder is optional:
                 http://www.w3.org/TR/wsdl#_parameter
+
+0.061  Fri Dec 17 15:45:00 GMT 2010
+    - JCOP Minor cleanup of development classes
