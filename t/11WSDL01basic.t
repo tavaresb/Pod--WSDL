@@ -6,6 +6,7 @@ use lib length $0 > 10 ? substr $0, 0, length($0) - 16 : '.';
 use strict;
 use warnings;
 use XML::XPath;
+use Test::XML;
 
 eval {
 	new Pod::WSDL(source => 'bla');
@@ -90,7 +91,7 @@ my $outputtest;
 
 my $tmp = $p->WSDL;
 $tmp =~ s/<!-- WSDL.*?-->\n//;
-ok($outputtest eq $tmp, "Pretty works.");
+is_xml($outputtest, $tmp, "Pretty works.");
 
 $outputtestFile = $0;
 $outputtestFile =~ s![^/]+$!outputtest002.xml!;
@@ -108,8 +109,8 @@ my $outputtest2;
 $tmp = $p->WSDL(pretty => 0);
 $tmp =~ s/<!-- WSDL.*?-->\n//;
 #print "--->$tmp<---\n";
-ok($outputtest2 eq $tmp, "Switch pretty off works.");
+is_xml($outputtest2, $tmp, "Switch pretty off works.");
 
 $tmp = $p->WSDL(pretty => 1);
 $tmp =~ s/<!-- WSDL.*?-->\n//;
-ok($outputtest eq $tmp, "Switch pretty on works.");
+is_xml($outputtest, $tmp, "Switch pretty on works.");
