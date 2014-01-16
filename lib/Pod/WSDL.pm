@@ -24,7 +24,7 @@ use Pod::WSDL::AUTOLOAD;
 # ------------------ > "CONSTANTS" ----------------------------------------- #
 # -------------------------------------------------------------------------- #
 
-our $VERSION                = "0.061";
+our $VERSION                = "0.062";
 our @ISA                    = qw/Pod::WSDL::AUTOLOAD/;
 
 our $WSDL_METHOD_REGEXP_BEG = qr/^=(?:begin)\s+wsdl\s*\n(.*?)^=(?:cut|end\s+wsdl).*?^\s*sub\s+(\w+)/ims;
