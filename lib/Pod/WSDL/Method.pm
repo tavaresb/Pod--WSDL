@@ -323,19 +323,19 @@ name - name of the method, mandatory
 
 =item
 
-doc - a Pod::WSDL::Doc object, can be ommitted, use method doc later
+doc - a Pod::WSDL::Doc object, can be omitted, use method doc later
 
 =item
 
-return - a Pod::WSDL::Return object, can be ommitted, use method return later
+return - a Pod::WSDL::Return object, can be omitted, use method return later
 
 =item
 
-params - ref to array of Pod::WSDL::Param objects, can be ommitted, use addParam() later
+params - ref to array of Pod::WSDL::Param objects, can be omitted, use addParam() later
 
 =item
 
-faults - ref to array of Pod::WSDL::Fault objects, can be ommitted, use addFault() later
+faults - ref to array of Pod::WSDL::Fault objects, can be omitted, use addFault() later
 
 =item
 

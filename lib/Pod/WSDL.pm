@@ -509,7 +509,7 @@ Use the C<=begin>/C<=end> respectively the C<=for> directives according to stand
 
 =back
 
-Any subroutine not preceeded by WSDL pod will be left unmentioned. Any standard pod will be ignored (though, for an exception to this, see the section on own complex types below).
+Any subroutine not preceded by WSDL pod will be left unmentioned. Any standard pod will be ignored (though, for an exception to this, see the section on own complex types below).
 
 The individual instructions for Pod::WSDL always begin with a keyword, like C<_RETURN> or C<_DOC> or C<_FAULT>. After this different things may follow, according to the specific type of instruction. The instruction may take one or more lines - everything up to the next line beginning with a keyword or the end of the pod is belonging to the current instruction.
 
