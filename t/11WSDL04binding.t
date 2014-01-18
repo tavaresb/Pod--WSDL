@@ -7,10 +7,11 @@ use strict;
 use warnings;
 use XML::XPath;
 
-my $p = new Pod::WSDL(source => 'My::BindingTest',
+my $p = Pod::WSDL->new(source => 'My::BindingTest',
 	               location => 'http://localhost/My/Test',
 	               pretty => 1,
-	               withDocumentation => 1);
+	               withDocumentation => 1,
+                   );
 
 my $xmlOutput = $p->WSDL;
 my $xp = XML::XPath->new(xml => $xmlOutput);
