@@ -66,10 +66,10 @@ our %FORBIDDEN_METHODS = (
 # -------------------------------------------------------------------------- #
 
 # bug #75339
-#   reserved words clash with AUTOLOAD and UNIVERSAL
+#   avoid using reserved words with our autoload methods, which clash with UNIVERSAL
 #   avoid breaking legacy code... rename sensitive words to new ones
 #       params:
-#           use
+#           use => pw_use
 sub new {
     my ( $pkg, %data ) = @_;
     my $nsnum = 0;
