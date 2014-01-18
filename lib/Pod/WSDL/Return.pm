@@ -4,31 +4,33 @@ use warnings;
 use Pod::WSDL::AUTOLOAD;
 
 our $VERSION = "0.05";
-our @ISA = qw/Pod::WSDL::AUTOLOAD/;
+our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our %FORBIDDEN_METHODS = (
-	type  => {get => 1, set =>  0},
-	array => {get => 1, set =>  0},
-	descr => {get => 1, set =>  0},
+    type  => { get => 1, set => 0 },
+    array => { get => 1, set => 0 },
+    descr => { get => 1, set => 0 },
 );
 
 sub new {
-	my ($pkg, $str) = @_;
+    my ( $pkg, $str ) = @_;
 
-	defined $str or $str = ''; # avoids warnings, dies soon
-	$str =~ s/\s*_RETURN\s*//i;
-	my ($type, $descr) = split /\s+/, $str, 2;
+    defined $str or $str = '';    # avoids warnings, dies soon
+    $str =~ s/\s*_RETURN\s*//i;
+    my ( $type, $descr ) = split /\s+/, $str, 2;
 
-	$type ||= ''; # avoids warnings, dies soon
+    $type ||= '';                 # avoids warnings, dies soon
 
-	$type =~ /([\$\@])(.+)/;
-	die "Type '$type' must have structure (\$|\@)<typename>, e.g. '\$boolean' or '\@string', died" unless $1 and $2;
-	
-	bless {
-		_type   => $2,
-		_descr  => $descr || '',
-		_array  => $1 eq '@' ? 1 : 0,
-	}, $pkg;
+    $type =~ /([\$\@])(.+)/;
+    die
+        "Type '$type' must have structure (\$|\@)<typename>, e.g. '\$boolean' or '\@string', died"
+        unless $1 and $2;
+
+    bless {
+        _type  => $2,
+        _descr => $descr || '',
+        _array => $1 eq '@' ? 1 : 0,
+    }, $pkg;
 }
 
 1;

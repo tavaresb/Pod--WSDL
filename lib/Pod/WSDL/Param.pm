@@ -4,38 +4,42 @@ use warnings;
 use Pod::WSDL::AUTOLOAD;
 
 our $VERSION = "0.05";
-our @ISA = qw/Pod::WSDL::AUTOLOAD/;
+our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our %FORBIDDEN_METHODS = (
-	name      => {get => 1, set =>  0},
-	type      => {get => 1, set =>  0},
-	paramType => {get => 1, set =>  0},
-	descr     => {get => 1, set =>  0},
-	array     => {get => 1, set =>  0},
+    name      => { get => 1, set => 0 },
+    type      => { get => 1, set => 0 },
+    paramType => { get => 1, set => 0 },
+    descr     => { get => 1, set => 0 },
+    array     => { get => 1, set => 0 },
 );
 
 sub new {
-	my ($pkg, $str) = @_;
+    my ( $pkg, $str ) = @_;
 
-	defined $str or $str = ''; # avoids warnings, dies soon
-	$str =~ s/\s*_(INOUT|IN|OUT)\s*//i or die "Input string '$str' does not begin with '_IN', '_OUT' or '_INOUT'";
-	
-	my $paramType = $1;
-	
-	my ($name, $type, $descr) = split /\s+/, $str, 3;
+    defined $str or $str = '';    # avoids warnings, dies soon
+    $str =~ s/\s*_(INOUT|IN|OUT)\s*//i
+        or die
+        "Input string '$str' does not begin with '_IN', '_OUT' or '_INOUT'";
 
-	$type ||= ''; # avoids warnings, dies soon
-	
-	$type =~ /([\$\@])(.+)/;
-	die "Type '$type' must have structure (\$|@)<typename>, e.g. '\$boolean' or '\@string', not '$type' died" unless $1 and $2;
-	
-	bless {
-		_name      => $name,
-		_type      => $2,
-		_paramType => $paramType,
-		_descr     => $descr || '',
-		_array     => $1 eq '@' ? 1 : 0,
-	}, $pkg;
+    my $paramType = $1;
+
+    my ( $name, $type, $descr ) = split /\s+/, $str, 3;
+
+    $type ||= '';                 # avoids warnings, dies soon
+
+    $type =~ /([\$\@])(.+)/;
+    die
+        "Type '$type' must have structure (\$|@)<typename>, e.g. '\$boolean' or '\@string', not '$type' died"
+        unless $1 and $2;
+
+    bless {
+        _name      => $name,
+        _type      => $2,
+        _paramType => $paramType,
+        _descr     => $descr || '',
+        _array     => $1 eq '@' ? 1 : 0,
+    }, $pkg;
 }
 
 1;

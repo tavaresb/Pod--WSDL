@@ -1,45 +1,50 @@
 package Pod::WSDL::Attr;
+
 use strict;
 use warnings;
 use Pod::WSDL::AUTOLOAD;
 
 our $VERSION = "0.05";
-our @ISA = qw/Pod::WSDL::AUTOLOAD/;
+our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our %FORBIDDEN_METHODS = (
-	name      => {get => 1, set =>  0},
-	type      => {get => 1, set =>  0},
-	nillable  => {get => 1, set =>  0},
-	descr     => {get => 1, set =>  0},
-	array     => {get => 1, set =>  0},
+    name     => { get => 1, set => 0 },
+    type     => { get => 1, set => 0 },
+    nillable => { get => 1, set => 0 },
+    descr    => { get => 1, set => 0 },
+    array    => { get => 1, set => 0 },
 );
 
 sub new {
-	my ($pkg, $str) = @_;
+    my ( $pkg, $str ) = @_;
 
-	defined $str or $str = ''; # avoids warnings
-	$str =~ s/\s*_ATTR\s*//i or die "Input string '$str' does not begin with '_ATTR'";
-	my ($name, $type, $needed, $descr) = split /\s+/, $str, 4;
+    defined $str or $str = '';    # avoids warnings
+    $str =~ s/\s*_ATTR\s*//i
+        or die "Input string '$str' does not begin with '_ATTR'";
 
-	$descr ||= '';
-	
-	if ((uc $needed) ne '_NEEDED') {
-		$descr  = "$needed $descr";
-		$needed = 0;
-	} else {
-		$needed = 1;
-	}
-	
-	$type =~ /([\$\@])(.*)/;
-	die "Type '$type' must be prefixed with either '\$' or '\@', died" unless $1;
-	
-	bless {
-		_name     => $name,
-		_type     => $2,
-		_nillable => $needed ? undef : 'true',
-		_descr    => $descr,
-		_array    => $1 eq '@' ? 1 : 0,
-	}, $pkg;
+    my ( $name, $type, $needed, $descr ) = split /\s+/, $str, 4;
+
+    $descr ||= '';
+
+    if ( ( uc $needed ) ne '_NEEDED' ) {
+        $descr  = "$needed $descr";
+        $needed = 0;
+    }
+    else {
+        $needed = 1;
+    }
+
+    $type =~ /([\$\@])(.*)/;
+    die "Type '$type' must be prefixed with either '\$' or '\@', died"
+        unless $1;
+
+    bless {
+        _name     => $name,
+        _type     => $2,
+        _nillable => $needed ? undef : 'true',
+        _descr    => $descr,
+        _array    => $1 eq '@' ? 1 : 0,
+    }, $pkg;
 }
 
 1;

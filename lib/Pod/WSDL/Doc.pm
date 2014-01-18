@@ -5,16 +5,17 @@ use warnings;
 use Pod::WSDL::AUTOLOAD;
 
 our $VERSION = "0.05";
-our @ISA = qw/Pod::WSDL::AUTOLOAD/;
-sub new {
-	my ($pkg, $str) = @_;
+our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
-	defined $str or $str = ''; # avoids warnings
-	$str =~ /\s*_DOC\s*(.*)/ or die "_DOC statements must have structure '_DOC <text>', like '_DOC This is my documentation'";
-	
-	bless {
-		_descr => $1 || '',
-	}, $pkg;
+sub new {
+    my ( $pkg, $str ) = @_;
+
+    defined $str or $str = '';    # avoids warnings
+    $str =~ /\s*_DOC\s*(.*)/
+        or die
+        "_DOC statements must have structure '_DOC <text>', like '_DOC This is my documentation'";
+
+    bless { _descr => $1 || '', }, $pkg;
 }
 
 1;

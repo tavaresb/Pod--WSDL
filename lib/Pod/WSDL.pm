@@ -75,12 +75,12 @@ sub new {
     my $nsnum = 0;
 
     croak "I need a location, died" unless defined $data{location};
-    if ( ! defined $data{source} ) {
-        croak "I need a file or module name or a filehandle, died"
+    if ( !defined $data{source} ) {
+        croak "I need a file or module name or a filehandle, died";
     }
 
     if ( $data{use} ) {
-        $data{pw_use} = delete $data{use} ;
+        $data{pw_use} = delete $data{use};
     }
     if (    $data{style}
         and $data{style} eq $DOCUMENT_STYLE
@@ -109,7 +109,7 @@ sub new {
         ),
         _standardTypeArrays  => {},
         _emptymessagewritten => 0,
-        _pw_use                 => $data{pw_use} || $ENCODED_USE,
+        _pw_use              => $data{pw_use} || $ENCODED_USE,
         _style               => $data{style} || $RPC_STYLE,
         _wrapped             => $data{wrapped} || 0,
     }, $pkg;

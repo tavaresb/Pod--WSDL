@@ -5,31 +5,33 @@ use warnings;
 use Pod::WSDL::AUTOLOAD;
 
 our $VERSION = "0.05";
-our @ISA = qw/Pod::WSDL::AUTOLOAD/;
+our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our %FORBIDDEN_METHODS = (
-	type      => {get => 1, set =>  0},
-	descr     => {get => 1, set =>  0},
-	wsdlName  => {get => 1, set =>  0},
+    type     => { get => 1, set => 0 },
+    descr    => { get => 1, set => 0 },
+    wsdlName => { get => 1, set => 0 },
 );
 
 sub new {
-	my ($pkg, $str) = @_;
+    my ( $pkg, $str ) = @_;
 
-	$str ||= '' ;  # avoid warnings here, will die soon
-	$str =~ s/^\s*_FAULT\s*//i or die "_FAULT statements must have structure '_FAULT <type> <text>', like '_FAULT My::Fault This is my documentation'";
-	my ($type, $descr) = split /\s+/, $str, 2;
+    $str ||= '';    # avoid warnings here, will die soon
+    $str =~ s/^\s*_FAULT\s*//i
+        or die
+        "_FAULT statements must have structure '_FAULT <type> <text>', like '_FAULT My::Fault This is my documentation'";
+    my ( $type, $descr ) = split /\s+/, $str, 2;
 
-	my $wsdlName = $type;
-	$wsdlName =~ s/::(.)/uc $1/eg;
+    my $wsdlName = $type;
+    $wsdlName =~ s/::(.)/uc $1/eg;
 
-	$descr ||= '';
-	
-	bless {
-		_type     => $type,
-		_descr    => $descr,
-		_wsdlName => ucfirst $wsdlName,
-	}, $pkg;
+    $descr ||= '';
+
+    bless {
+        _type     => $type,
+        _descr    => $descr,
+        _wsdlName => ucfirst $wsdlName,
+    }, $pkg;
 }
 
 1;

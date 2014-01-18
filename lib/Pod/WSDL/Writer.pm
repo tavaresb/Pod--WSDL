@@ -12,181 +12,199 @@ our $INDENT_CHAR = "\t";
 our $NL_CHAR     = "\n";
 
 sub new {
-	my ($pkg, %data) = @_;
+    my ( $pkg, %data ) = @_;
 
-	$data{pretty} ||= 0;
-	$data{withDocumentation} ||= 0;
-	
-	my $outStr = "";
+    $data{pretty}            ||= 0;
+    $data{withDocumentation} ||= 0;
 
-	my $me = bless {
-		_pretty              => $data{pretty},
-		_withDocumentation   => $data{withDocumentation},
-		_outStr              => \$outStr,
-		_writer              => undef,
-		_indent              => 1,
-		_lastTag             => '',
-		_faultMessageWritten => {},
-		_emptyMessageWritten => 0,
-	}, $pkg;
-	
-	$me->prepare;
+    my $outStr = "";
 
-	return $me;	
-		
+    my $me = bless {
+        _pretty              => $data{pretty},
+        _withDocumentation   => $data{withDocumentation},
+        _outStr              => \$outStr,
+        _writer              => undef,
+        _indent              => 1,
+        _lastTag             => '',
+        _faultMessageWritten => {},
+        _emptyMessageWritten => 0,
+    }, $pkg;
+
+    $me->prepare;
+
+    return $me;
+
 }
 
 sub wrNewLine {
-	my $me  = shift;
-	my $cnt = shift;
+    my $me  = shift;
+    my $cnt = shift;
 
-	$cnt ||= 1;
+    $cnt ||= 1;
 
-	return unless $me->{_pretty};
+    return unless $me->{_pretty};
 
-	$me->{_writer}->characters($NL_CHAR x $cnt);
+    $me->{_writer}->characters( $NL_CHAR x $cnt );
 }
 
 sub wrElem {
-	my $me     = shift;
-	my $type   = shift;
+    my $me   = shift;
+    my $type = shift;
 
-	if ($me->{_pretty}) {
-		if ($me->{_lastTag} eq $START_PREFIX_NAME and ($type eq $START_PREFIX_NAME or $type eq $EMPTY_PREFIX_NAME)) {
-			$me->{_indent}++;
-		} elsif ($me->{_lastTag} ne $START_PREFIX_NAME and $type eq $END_PREFIX_NAME) {
-			$me->{_indent}--;
-		}
-		
-		$me->{_lastTag} = $type;
+    if ( $me->{_pretty} ) {
+        if ( $me->{_lastTag} eq $START_PREFIX_NAME
+            and ( $type eq $START_PREFIX_NAME or $type eq $EMPTY_PREFIX_NAME ) )
+        {
+            $me->{_indent}++;
+        }
+        elsif ( $me->{_lastTag} ne $START_PREFIX_NAME
+            and $type eq $END_PREFIX_NAME ) {
+            $me->{_indent}--;
+        }
 
-		$me->{_writer}->characters($INDENT_CHAR x $me->{_indent});
-	}
+        $me->{_lastTag} = $type;
 
-	$type .= 'Tag';
-	$me->{_writer}->$type(@_);
+        $me->{_writer}->characters( $INDENT_CHAR x $me->{_indent} );
+    }
 
-	$me->wrNewLine;
+    $type .= 'Tag';
+    $me->{_writer}->$type( @_ );
+
+    $me->wrNewLine;
 }
 
 sub wrDoc {
-	my $me  = shift;
+    my $me = shift;
 
-	return unless $me->{_withDocumentation};
+    return unless $me->{_withDocumentation};
 
-	my $txt = shift;
-	my %args = @_;
-	my $useAnnotation = 0;
-	my $docTagName = "wsdl:documentation";
-	
-	if (%args and $args{useAnnotation}) {
-		$useAnnotation = 1;
-		$docTagName = "documentation";
-	}
+    my $txt           = shift;
+    my %args          = @_;
+    my $useAnnotation = 0;
+    my $docTagName    = "wsdl:documentation";
 
+    if ( %args and $args{useAnnotation} ) {
+        $useAnnotation = 1;
+        $docTagName    = "documentation";
+    }
 
-	$txt ||= '';
-	$txt =~ s/\s+$//;
-		
-	return unless $txt;
-	
-	$me->{_writer}->characters($INDENT_CHAR x ($me->{_indent} + ($me->{_lastTag} eq $START_PREFIX_NAME ? 1 : 0))) if $me->{_pretty};
+    $txt ||= '';
+    $txt =~ s/\s+$//;
 
-	if ($useAnnotation) {
-		$me->{_writer}->startTag("annotation") ;
-		$me->wrNewLine;
-		$me->{_indent}++;
-		$me->{_writer}->characters($INDENT_CHAR x ($me->{_indent} + ($me->{_lastTag} eq $START_PREFIX_NAME ? 1 : 0))) if $me->{_pretty};
-	}
-	
-	$me->{_writer}->startTag($docTagName);
-	$me->{_writer}->characters($txt);
-	$me->{_writer}->endTag($docTagName);
+    return unless $txt;
 
-	if ($useAnnotation) {
-		$me->wrNewLine;
-		$me->{_indent}--;
-		$me->{_writer}->characters($INDENT_CHAR x ($me->{_indent} + ($me->{_lastTag} eq $START_PREFIX_NAME ? 1 : 0))) if $me->{_pretty};
-		$me->{_writer}->endTag("annotation");
-	}
-	
-	$me->wrNewLine;
+    $me->{_writer}->characters(
+        $INDENT_CHAR x (
+            $me->{_indent} + ( $me->{_lastTag} eq $START_PREFIX_NAME ? 1 : 0 )
+        )
+    ) if $me->{_pretty};
+
+    if ( $useAnnotation ) {
+        $me->{_writer}->startTag( "annotation" );
+        $me->wrNewLine;
+        $me->{_indent}++;
+        $me->{_writer}->characters(
+            $INDENT_CHAR x (
+                $me->{_indent}
+                    + ( $me->{_lastTag} eq $START_PREFIX_NAME ? 1 : 0 )
+            )
+        ) if $me->{_pretty};
+    }
+
+    $me->{_writer}->startTag( $docTagName );
+    $me->{_writer}->characters( $txt );
+    $me->{_writer}->endTag( $docTagName );
+
+    if ( $useAnnotation ) {
+        $me->wrNewLine;
+        $me->{_indent}--;
+        $me->{_writer}->characters(
+            $INDENT_CHAR x (
+                $me->{_indent}
+                    + ( $me->{_lastTag} eq $START_PREFIX_NAME ? 1 : 0 )
+            )
+        ) if $me->{_pretty};
+        $me->{_writer}->endTag( "annotation" );
+    }
+
+    $me->wrNewLine;
 }
 
 sub output {
-	my $me = shift;
-	return ${$me->{_outStr}};
+    my $me = shift;
+    return ${ $me->{_outStr} };
 }
 
 sub prepare {
-	my $me = shift;
-	${$me->{_outStr}} = "";
-	$me->{_emptyMessageWritten} = 0;
-	$me->{_writer} = new XML::Writer(OUTPUT => $me->{_outStr});
-	$me->{_writer}->xmlDecl("UTF-8");
+    my $me = shift;
+    ${ $me->{_outStr} } = "";
+    $me->{_emptyMessageWritten} = 0;
+    $me->{_writer} = new XML::Writer( OUTPUT => $me->{_outStr} );
+    $me->{_writer}->xmlDecl( "UTF-8" );
 }
 
 sub withDocumentation {
-	my $me = shift;
-	my $arg = shift;
-	
-	if (defined $arg) {
-		$me->{_withDocumentation} = $arg;
-		return $me;
-	} else {
-		return $me->{_withDocumentation};
-	}
+    my $me  = shift;
+    my $arg = shift;
+
+    if ( defined $arg ) {
+        $me->{_withDocumentation} = $arg;
+        return $me;
+    }
+
+    return $me->{_withDocumentation};
 }
 
 sub pretty {
-	my $me = shift;
-	my $arg = shift;
-	
-	if (defined $arg) {
-		$me->{_pretty} = $arg;
-		return $me;
-	} else {
-		return $me->{_pretty};
-	}
+    my $me  = shift;
+    my $arg = shift;
+
+    if ( defined $arg ) {
+        $me->{_pretty} = $arg;
+        return $me;
+    }
+
+    return $me->{_pretty};
 }
 
 sub registerWrittenFaultMessage {
-	my $me = shift;
-	my $arg = shift;
-	
-	return $me->{_faultMessageWritten}->{$arg} = 1;
+    my $me  = shift;
+    my $arg = shift;
+
+    return $me->{_faultMessageWritten}->{$arg} = 1;
 }
 
 sub faultMessageWritten {
-	my $me = shift;
-	my $arg = shift;
-	
-	return $me->{_faultMessageWritten}->{$arg};
+    my $me  = shift;
+    my $arg = shift;
+
+    return $me->{_faultMessageWritten}->{$arg};
 }
 
 sub registerWrittenEmptyMessage {
-	my $me = shift;
-	
-	return $me->{_emptyMessageWritten} = 1;
+    my $me = shift;
+
+    return $me->{_emptyMessageWritten} = 1;
 }
 
 sub emptyMessageWritten {
-	my $me = shift;
-	
-	return $me->{_emptyMessageWritten};
+    my $me = shift;
+
+    return $me->{_emptyMessageWritten};
 }
 
 sub AUTOLOAD {
-    my $me     = shift;
-    
-    my $method   = $AUTOLOAD;
+    my $me = shift;
+
+    my $method = $AUTOLOAD;
     $method =~ s/.*:://;
 
-    if ($method eq "DESTROY"){
-		return;
-    } else {
-    	no strict 'refs';
-    	$me->{_writer}->$method(@_);
+    if ( $method eq "DESTROY" ) {
+        return;
+    }
+    else {
+        no strict 'refs';
+        $me->{_writer}->$method( @_ );
     }
 }
 
