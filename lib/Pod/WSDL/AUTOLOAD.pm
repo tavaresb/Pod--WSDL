@@ -8,41 +8,57 @@ our $AUTOLOAD;
 our $VERSION = "0.05";
 
 sub AUTOLOAD {
-    my $me     = shift;
-    my $param  = shift;
-    
-    my $fbd = ref($me) . '::FORBIDDEN_METHODS';
-    
-    my $attr   = $AUTOLOAD;
+    my $me    = shift;
+    my $param = shift;
+
+    my $fbd = ref( $me ) . '::FORBIDDEN_METHODS';
+
+    my $attr = $AUTOLOAD;
     $attr =~ s/.*:://;
 
-    if (@_) {
-		croak ref $me . " received call to '$attr' with too many params (max 1). Call was '$attr($param, " . join (", ",  @_) .  ")'!"; 
+    if ( @_ ) {
+        croak ref $me
+            . " received call to '$attr' with too many params (max 1). Call was '$attr($param, "
+            . join( ", ", @_ ) . ")'!";
     }
-    
-    if ($attr eq "DESTROY"){
-		return;
-    } elsif (exists $me->{'_' . $attr}) {
-    	no strict 'refs';
-		if (defined $param) {
-			croak ref ($me) . " does not allow setting of '$attr', died" if (caller)[0] ne ref($me) and %$fbd and $fbd->{$attr} and !$fbd->{$attr}->{set};
-		    $me->{'_' . $attr} = $param; 
-	    	return $me;
-		} else {
-			croak ref ($me) . " does not allow getting of '$attr', died" if (caller)[0] ne ref($me) and %$fbd and $fbd->{$attr} and !$fbd->{$attr}->{get};
-		    #if (ref $me->{'_' . $attr} eq 'ARRAY') {
-			#    return @{$me->{'_' . $attr}};
-		    #} elsif (ref $me->{'_' . $attr} eq 'HASH') {
-			#    return %{$me->{'_' . $attr}};
-		    #} elsif (ref $me->{'_' . $attr} eq 'SCALAR') {
-			#    return ${$me->{'_' . $attr}};
-		    #} else {
-		    	return $me->{'_' . $attr};
-		    #}
-		}
-    } else {
-		croak "I have no method called '$attr()'!";
+
+    if ( $attr eq "DESTROY" ) {
+        return;
     }
+
+    if ( !exists $me->{ '_' . $attr } ) {
+        croak "I have no method called '$attr()'!";
+    }
+
+    no strict 'refs';
+    if ( defined $param ) {
+
+        croak ref( $me ) . " does not allow setting of '$attr', died"
+            if ( caller )[0] ne ref( $me )
+            and %$fbd
+            and $fbd->{$attr}
+            and !$fbd->{$attr}->{set};
+
+        $me->{ '_' . $attr } = $param;
+        return $me;
+    }
+
+    croak ref( $me ) . " does not allow getting of '$attr', died"
+        if ( caller )[0] ne ref( $me )
+        and %$fbd
+        and $fbd->{$attr}
+        and !$fbd->{$attr}->{get};
+
+    #if (ref $me->{'_' . $attr} eq 'ARRAY') {
+    #    return @{$me->{'_' . $attr}};
+    #} elsif (ref $me->{'_' . $attr} eq 'HASH') {
+    #    return %{$me->{'_' . $attr}};
+    #} elsif (ref $me->{'_' . $attr} eq 'SCALAR') {
+    #    return ${$me->{'_' . $attr}};
+    #} else {
+    return $me->{ '_' . $attr };
+
+    #}
 }
 
 1;
