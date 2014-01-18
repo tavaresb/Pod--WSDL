@@ -52,3 +52,13 @@ Revision history for Perl extension Pod::WSDL.
 
 0.061  Fri Dec 17 15:45:00 GMT 2010
     - JCOP Minor cleanup of development classes
+
+0.062 17 Jan 2014
+    - BMAVT BUG fix: https://rt.cpan.org/Public/Bug/Display.html?id=81571
+        Test failures due to hash randomisation in perl 5.17.6 
+    - BMAVT BUG fix: https://rt.cpan.org/Public/Bug/Display.html?id=92192
+        Spelling errors in POD
+
+0.063 18 Jan 2014
+    - JCOP BUG fix: https://rt.cpan.org/Public/Bug/Display.html?id=75339
+        me->use fails with new perl version because this calls UNIVERSAL::use instead of Pod::WSDL::AUTOLOAD

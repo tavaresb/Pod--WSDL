@@ -57,6 +57,8 @@ our %FORBIDDEN_METHODS = (
 # --------------- > PUBLIC METHODS  ---------------------------------------- #
 # -------------------------------------------------------------------------- #
 
+# avoid using reserved words with our autoload methods
+#   use => pw_use; no not break backward compatibility
 sub new {
 	my ($pkg, %data) = @_;
 	my $nsnum = 0;
@@ -64,8 +66,11 @@ sub new {
 	croak "I need a location, died" unless defined $data{location};
 	croak "I need a file or module name or a filehandle, died" unless defined $data{source};
 	
-	$data{use} = $LITERAL_USE if $data{style} and $data{style} eq $DOCUMENT_STYLE and !defined $data{use};
-	$data{use} = $LITERAL_USE and $data{style} = $DOCUMENT_STYLE if $data{wrapped} and !defined $data{use} and !defined $data{style};
+    if ( $data{use} ) {
+        $data{pw_use} = delete $data{use} ;
+    }
+	$data{pw_use} = $LITERAL_USE if $data{style} and $data{style} eq $DOCUMENT_STYLE and !defined $data{pw_use};
+	$data{pw_use} = $LITERAL_USE and $data{style} = $DOCUMENT_STYLE if $data{wrapped} and !defined $data{pw_use} and !defined $data{style};
 
 	my $me = bless {
 		_source              => $data{source},
@@ -79,14 +84,14 @@ sub new {
 		_writer              => new Pod::WSDL::Writer(withDocumentation => $data{withDocumentation}, pretty => $data{pretty}),
 		_standardTypeArrays  => {},
 		_emptymessagewritten => 0,
-		_use                 => $data{use} || $ENCODED_USE,
+		_pw_use              => $data{pw_use} || $ENCODED_USE,
 		_style               => $data{style} || $RPC_STYLE,
 		_wrapped             => $data{wrapped} || 0,
 	}, $pkg;
 
-	croak "'use' argument may only be one of $ENCODED_USE or $LITERAL_USE, died" if $me->use ne $ENCODED_USE and $me->use ne $LITERAL_USE; 
+	croak "'use' argument may only be one of $ENCODED_USE or $LITERAL_USE, died" if $me->pw_use ne $ENCODED_USE and $me->pw_use ne $LITERAL_USE; 
 	croak "'style' argument may only be one of $RPC_STYLE or $DOCUMENT_STYLE, died" if $me->style ne $RPC_STYLE and $me->style ne $DOCUMENT_STYLE;
-	croak "The combination of use=$ENCODED_USE and style=$DOCUMENT_STYLE is not valid, died" if ($me->style eq $DOCUMENT_STYLE and $me->use eq $ENCODED_USE);
+	croak "The combination of use=$ENCODED_USE and style=$DOCUMENT_STYLE is not valid, died" if ($me->style eq $DOCUMENT_STYLE and $me->pw_use eq $ENCODED_USE);
 
 	## AHICOX 10/12/2006
 	## this is a quick and dirty hack to set the baseName
@@ -442,7 +447,7 @@ sub _writeBinding {
 	$me->writer->wrNewLine;
 	
 	for my $method (@{$me->methods}) {
-		$method->writeBindingOperation($me->targetNS, $me->use);
+		$method->writeBindingOperation($me->targetNS, $me->pw_use);
 		$me->writer->wrNewLine;
 	}
 
