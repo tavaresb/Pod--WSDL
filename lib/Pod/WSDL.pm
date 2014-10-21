@@ -29,8 +29,8 @@ use Data::Dumper;
 # ------------------ > "CONSTANTS" ----------------------------------------- #
 # -------------------------------------------------------------------------- #
 
-our $VERSION = "0.062";
-our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
+our $VERSION                = "0.063";
+our @ISA                    = qw/Pod::WSDL::AUTOLOAD/;
 
 our $WSDL_METHOD_REGEXP_BEG
     = qr/^=(?:begin)\s+wsdl\s*\n(.*?)^=(?:cut|end\s+wsdl).*?^\s*sub\s+(\w+)/ims;
