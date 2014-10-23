@@ -169,16 +169,4 @@ see Pod::WSDL
 
   Pod::WSDL ;-)
  
-=head1 AUTHOR
-
-Tarek Ahmed, E<lt>bloerch -the character every email address contains- oelbsk.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2006 by Tarek Ahmed
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.5 or,
-at your option, any later version of Perl 5 you may have available.
-
 =cut

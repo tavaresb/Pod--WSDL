@@ -827,17 +827,4 @@ Pod::WSDL writes WSDL documents in encoded RPC style. It should be able to gener
   SOAP::WSDL (the client side)
   SOAP::Clean::WSDL (I have not tried this)
  
-=head1 AUTHOR
-
-Tarek Ahmed, E<lt>bloerch -the character every email address contains- oelbsk.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2006 by Tarek Ahmed
-
-This library is alpha software and comes with no warranty whatsoever.
-It is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.5 or,
-at your option, any later version of Perl 5 you may have available.
-
 =cut
