@@ -11,7 +11,6 @@ use Pod::WSDL::Writer;
 use Pod::WSDL::Utils qw(:writexml :namespaces :messages);
 use Pod::WSDL::AUTOLOAD;
 
-our $VERSION = "0.05";
 our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our $EMPTY_MESSAGE_NAME   = 'empty';

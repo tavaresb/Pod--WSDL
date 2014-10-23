@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 our $AUTOLOAD;
-our $VERSION = "0.05";
 
 sub AUTOLOAD {
     my $me    = shift;
