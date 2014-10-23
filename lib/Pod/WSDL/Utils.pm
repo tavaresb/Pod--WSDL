@@ -21,6 +21,7 @@ our @EXPORT_OK = (
     @{ $EXPORT_TAGS{messages} },
     @{ $EXPORT_TAGS{types} }
 );
+our $VERSION = "0.05";
 
 # writexml
 our $END_PREFIX_NAME   = 'end';
