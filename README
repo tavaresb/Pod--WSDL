@@ -320,11 +320,14 @@ SEE ALSO
       SOAP::Clean::WSDL (I have not tried this)
  
 AUTHOR
-    Tarek Ahmed, <bloerch -the character every email address contains-
-    oelbsk.org>
+    Tarek Ahmed
+
+MAINTAINER
+    Jose Carlos OLiveira Pereira    jcop  (at) cpan.org
+    Bruno Tavares                   bmavt (at) cpan.org
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2010 by Tarek Ahmed
+    Copyright (C) 2014 by Jose Carlos Oliveira Pereira
 
     This library is alpha software and comes with no warranty whatsoever. It
     is free software; you can redistribute it and/or modify it under the

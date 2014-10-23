@@ -1,4 +1,5 @@
 package Pod::WSDL::Type;
+# ABSTRACT: Represents a type in Pod::WSDL (internal use only)
 
 use strict;
 use warnings;
@@ -6,7 +7,6 @@ use Pod::WSDL::Attr;
 use Pod::WSDL::Utils qw(:writexml :namespaces :types);
 use Pod::WSDL::AUTOLOAD;
 
-our $VERSION = "0.05";
 our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our %FORBIDDEN_METHODS = (
@@ -138,10 +138,6 @@ sub writeComplexType {
 
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL::Type - Represents a type in Pod::WSDL (internal use only)
 
 =head1 SYNOPSIS
 

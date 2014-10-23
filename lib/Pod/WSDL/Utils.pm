@@ -1,5 +1,5 @@
 package Pod::WSDL::Utils;
-
+# ABSTRACT:  Utilities and constants for Pod::WSDL (internal use only)
 use strict;
 use warnings;
 require Exporter;
@@ -21,7 +21,6 @@ our @EXPORT_OK = (
     @{ $EXPORT_TAGS{messages} },
     @{ $EXPORT_TAGS{types} }
 );
-our $VERSION = "0.05";
 
 # writexml
 our $END_PREFIX_NAME   = 'end';
@@ -134,10 +133,6 @@ sub getTypeDescr {
 
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL::Utils - Utilities and constants for Pod::WSDL (internal use only)
 
 =head1 DESCRIPTION
 

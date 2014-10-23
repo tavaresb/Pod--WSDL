@@ -1,4 +1,5 @@
 package Pod::WSDL::Writer;
+# ABSTRACT: Writes XML output for Pod::WSDL (internal use only)
 
 use strict;
 use warnings;
@@ -6,7 +7,6 @@ use XML::Writer;
 use Pod::WSDL::Utils ':writexml';
 
 our $AUTOLOAD;
-our $VERSION = "0.05";
 
 our $INDENT_CHAR = "\t";
 our $NL_CHAR     = "\n";
@@ -210,10 +210,6 @@ sub AUTOLOAD {
 
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL::Writer - Writes XML output for Pod::WSDL (internal use only)
 
 =head1 SYNOPSIS
 

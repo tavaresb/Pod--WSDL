@@ -1,4 +1,5 @@
 package Pod::WSDL::Method;
+# ABSTRACT: Represents a method in Pod::WSDL (internal use only)
 
 use strict;
 use warnings;
@@ -10,7 +11,6 @@ use Pod::WSDL::Writer;
 use Pod::WSDL::Utils qw(:writexml :namespaces :messages);
 use Pod::WSDL::AUTOLOAD;
 
-our $VERSION = "0.05";
 our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our $EMPTY_MESSAGE_NAME   = 'empty';
@@ -386,10 +386,6 @@ sub writeDocumentStyleSchemaElements {
 }
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL::Method - Represents a method in Pod::WSDL (internal use only)
 
 =head1 SYNOPSIS
 

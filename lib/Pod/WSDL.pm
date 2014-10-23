@@ -1,4 +1,5 @@
 package Pod::WSDL;
+# ABSTRACT:  Creates WSDL documents from (extended) pod
 
 use strict;
 use warnings;
@@ -556,10 +557,6 @@ sub _writeService {
 
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL - Creates WSDL documents from (extended) pod
 
 =head1 SYNOPSIS
 

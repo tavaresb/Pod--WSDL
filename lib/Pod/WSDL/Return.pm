@@ -1,9 +1,10 @@
 package Pod::WSDL::Return;
+# ABSTRACT: Represents the WSDL pod for the return value of a method (internal use only)
+
 use strict;
 use warnings;
 use Pod::WSDL::AUTOLOAD;
 
-our $VERSION = "0.05";
 our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 our %FORBIDDEN_METHODS = (
@@ -35,10 +36,6 @@ sub new {
 
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL::Return - Represents the WSDL pod for the return value of a method (internal use only)
 
 =head1 SYNOPSIS
 

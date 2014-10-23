@@ -1,10 +1,12 @@
 package Pod::WSDL::Doc;
+
+# ABSTRACT: Represents the WSDL pod for the documentation of methods (internal use only)
+
 use strict;
 use warnings;
 
 use Pod::WSDL::AUTOLOAD;
 
-our $VERSION = "0.05";
 our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
 
 sub new {
@@ -20,10 +22,6 @@ sub new {
 
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL::Doc - Represents the WSDL pod for the documentation of methods (internal use only)
 
 =head1 SYNOPSIS
 

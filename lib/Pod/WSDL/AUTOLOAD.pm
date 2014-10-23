@@ -1,11 +1,11 @@
 package Pod::WSDL::AUTOLOAD;
+# ABSTRACT:  Base class for autoloading (internal use only)
 
 use Carp;
 use strict;
 use warnings;
 
 our $AUTOLOAD;
-our $VERSION = "0.05";
 
 sub AUTOLOAD {
     my $me    = shift;
@@ -63,10 +63,6 @@ sub AUTOLOAD {
 
 1;
 __END__
-
-=head1 NAME
-
-Pod::WSDL::AUTOLOAD - Base class for autoloading (internal use only)
 
 =head1 SYNOPSIS
 
