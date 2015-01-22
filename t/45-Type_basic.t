@@ -16,7 +16,7 @@ my $t1 = new Pod::WSDL::Type(
     'name'   => 'foo',
     'array'  => 1,
     'descr'  => 'a description',
-    'writer' => new Pod::WSDL::Writer
+    'writer' => new Pod::WSDL::Writer,
 );
 
 ok( $t1->name eq 'foo',            'Read name argument correctly from input' );
