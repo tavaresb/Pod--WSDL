@@ -1,4 +1,5 @@
 package Pod::WSDL;
+
 # ABSTRACT:  Creates WSDL documents from (extended) pod
 
 use strict;
@@ -9,8 +10,8 @@ use warnings;
 # TODO: read type information alternatively from own file
 # TODO: write soapAction attribute in operations?
 
-use strict;
-use warnings;
+use base 'Pod::WSDL::AUTOLOAD';
+
 use Carp;
 use IO::Scalar;
 use Pod::Text;
@@ -22,7 +23,6 @@ use Pod::WSDL::Doc;
 use Pod::WSDL::Type;
 use Pod::WSDL::Writer;
 use Pod::WSDL::Utils qw(:writexml :namespaces :messages :types);
-use Pod::WSDL::AUTOLOAD;
 
 use Data::Dumper;
 
@@ -30,8 +30,7 @@ use Data::Dumper;
 # ------------------ > "CONSTANTS" ----------------------------------------- #
 # -------------------------------------------------------------------------- #
 
-our $VERSION                = "0.063";
-our @ISA                    = qw/Pod::WSDL::AUTOLOAD/;
+our $VERSION = '0.063';
 
 our $WSDL_METHOD_REGEXP_BEG
     = qr/^=(?:begin)\s+wsdl\s*\n(.*?)^=(?:cut|end\s+wsdl).*?^\s*sub\s+(\w+)/ims;
@@ -47,19 +46,18 @@ our $BINDING_SUFFIX_NAME   = 'SoapBinding';
 our $SERVICE_SUFFIX_NAME   = 'Service';
 
 # Pod::WSDL::AUTOLOAD uses this
-our %FORBIDDEN_METHODS = (
-    source              => { get => 0, set => 0 },
-    source              => { get => 0, set => 0 },
-    baseName            => { get => 0, set => 0 },
-    methods             => { get => 0, set => 0 },
-    location            => { get => 1, set => 1 },
-    namespaces          => { get => 0, set => 0 },
-    generateNS          => { get => 0, set => 0 },
-    types               => { get => 0, set => 0 },
-    writer              => { get => 0, set => 0 },
-    standardTypeArrays  => { get => 0, set => 0 },
-    emptymessagewritten => { get => 0, set => 0 },
-    targetNS            => { get => 1, set => 1 },
+our %FORBIDDEN_METHODS = ( 'source'              => { 'get' => 0, 'set' => 0 },
+                           'source'              => { 'get' => 0, 'set' => 0 },
+                           'baseName'            => { 'get' => 0, 'set' => 0 },
+                           'methods'             => { 'get' => 0, 'set' => 0 },
+                           'location'            => { 'get' => 1, 'set' => 1 },
+                           'namespaces'          => { 'get' => 0, 'set' => 0 },
+                           'generateNS'          => { 'get' => 0, 'set' => 0 },
+                           'types'               => { 'get' => 0, 'set' => 0 },
+                           'writer'              => { 'get' => 0, 'set' => 0 },
+                           'standardTypeArrays'  => { 'get' => 0, 'set' => 0 },
+                           'emptymessagewritten' => { 'get' => 0, 'set' => 0 },
+                           'targetNS'            => { 'get' => 1, 'set' => 1 },
 );
 
 # -------------------------------------------------------------------------- #
@@ -75,54 +73,62 @@ sub new {
     my ( $pkg, %data ) = @_;
     my $nsnum = 0;
 
-    croak "I need a location, died" unless defined $data{location};
-    if ( !defined $data{source} ) {
-        croak "I need a file or module name or a filehandle, died";
+    croak 'I need a location, died' unless defined $data{'location'};
+    if ( !defined $data{'source'} ) {
+        croak 'I need a file or module name or a filehandle, died';
     }
 
-    if ( $data{use} ) {
-        $data{pw_use} = delete $data{use};
+    if ( $data{'use'} ) {
+        $data{'pw_use'} = delete $data{'use'};
     }
-    if (    $data{style}
-        and $data{style} eq $DOCUMENT_STYLE
-        and !defined $data{pw_use} ) {
-        $data{pw_use} = $LITERAL_USE;
+    if (     $data{'style'}
+         and $data{'style'} eq $DOCUMENT_STYLE
+         and ( not defined $data{'pw_use'} ) ) {
+        $data{'pw_use'} = $LITERAL_USE;
     }
 
-    if ( $data{wrapped} and !defined $data{pw_use} and !defined $data{style} ) {
+    if (     $data{'wrapped'}
+         and ( not defined $data{'pw_use'} )
+         and ( not defined $data{'style'} ) ) {
 
         #jcp: wtf ????
-        $data{pw_use} = $LITERAL_USE and $data{style} = $DOCUMENT_STYLE;
+        $data{'pw_use'} = $LITERAL_USE and $data{'style'} = $DOCUMENT_STYLE;
     }
 
-    my $me = bless {
-        _source     => $data{source},
-        _baseName   => undef,
-        _methods    => [],
-        _location   => $data{location},
-        _namespaces => {},
-        _targetNS   => undef,
-        _generateNS => sub { return $DEFAULT_NS_DECL . $nsnum++ },
-        _types      => {},
-        _writer     => new Pod::WSDL::Writer(
-            withDocumentation => $data{withDocumentation},
-            pretty            => $data{pretty}
-        ),
-        _standardTypeArrays  => {},
-        _emptymessagewritten => 0,
-        _pw_use              => $data{pw_use} || $ENCODED_USE,
-        _style               => $data{style} || $RPC_STYLE,
-        _wrapped             => $data{wrapped} || 0,
+    my $me = bless {'_source'     => $data{'source'},
+                    '_baseName'   => undef,
+                    '_methods'    => [],
+                    '_location'   => $data{'location'},
+                    '_namespaces' => {},
+                    '_targetNS'   => undef,
+                    '_generateNS' => sub { return $DEFAULT_NS_DECL . $nsnum++ },
+                    '_types'      => {},
+                    '_writer' =>
+                        Pod::WSDL::Writer->new(
+                              'withDocumentation' => $data{'withDocumentation'},
+                              'pretty'            => $data{'pretty'}
+                        ),
+                    '_standardTypeArrays'  => {},
+                    '_emptymessagewritten' => 0,
+                    '_pw_use'              => $data{'pw_use'} || $ENCODED_USE,
+                    '_style'               => $data{'style'} || $RPC_STYLE,
+                    '_wrapped'             => $data{'wrapped'} || 0,
     }, $pkg;
 
-    croak "'use' argument may only be one of $ENCODED_USE or $LITERAL_USE, died"
-        if $me->pw_use ne $ENCODED_USE and $me->pw_use ne $LITERAL_USE;
-    croak
-        "'style' argument may only be one of $RPC_STYLE or $DOCUMENT_STYLE, died"
-        if $me->style ne $RPC_STYLE and $me->style ne $DOCUMENT_STYLE;
-    croak
-        "The combination of use=$ENCODED_USE and style=$DOCUMENT_STYLE is not valid, died"
-        if ( $me->style eq $DOCUMENT_STYLE and $me->pw_use eq $ENCODED_USE );
+    if ( $me->pw_use ne $ENCODED_USE and $me->pw_use ne $LITERAL_USE ) {
+        croak
+            "'use' argument may only be one of $ENCODED_USE or $LITERAL_USE, died";
+    }
+
+    if ( $me->style ne $RPC_STYLE and $me->style ne $DOCUMENT_STYLE ) {
+        croak
+            "'style' argument may only be one of $RPC_STYLE or $DOCUMENT_STYLE, died";
+    }
+
+    if ( $me->style eq $DOCUMENT_STYLE and $me->pw_use eq $ENCODED_USE ) {
+        croak
+            "The combination of use=$ENCODED_USE and style=$DOCUMENT_STYLE is not valid, died";
+    }
 
     ## AHICOX 10/12/2006
     ## this is a quick and dirty hack to set the baseName
@@ -146,22 +152,28 @@ sub WSDL {
     $wr->prepare;
 
     if ( %args ) {
-        $wr->pretty( $args{pretty} ) if defined $args{pretty};
-        $wr->withDocumentation( $args{withDocumentation} )
-            if defined $args{withDocumentation};
+
+        if ( defined $args{'pretty'} ) {
+            $wr->pretty( $args{'pretty'} );
+        }
+
+        if ( defined $args{'withDocumentation'} ) {
+            $wr->withDocumentation( $args{'withDocumentation'} );
+        }
     }
 
-    $me->writer->comment( "WSDL for "
-            . $me->{_location}
-            . " created by "
-            . ref( $me )
-            . " version: $VERSION on "
-            . scalar localtime );
-    $me->writer->startTag(
-        'wsdl:definitions',
-        targetNamespace => $me->targetNS,
-        %{ $me->{_namespaces} }
+    $me->writer->comment(   'WSDL for '
+                          . $me->{'_location'}
+                          . ' created by '
+                          . ref( $me )
+                          . " version: $VERSION on "
+                          . scalar localtime );
+
+    $me->writer->startTag( 'wsdl:definitions',
+                           'targetNamespace' => $me->targetNS,
+                           %{ $me->{'_namespaces'} }
     );
+
     $me->writer->wrNewLine( 2 );
 
     $me->_writeTypes;
@@ -183,13 +195,13 @@ sub addNamespace {
     my $uri  = shift;
     my $decl = shift;
 
-    croak "I need a namespace, died" unless defined $uri;
+    croak 'I need a namespace, died' unless defined $uri;
 
-    defined $decl or $decl = $me->{_generateNS};
+    defined $decl or $decl = $me->{'_generateNS'};
 
     $decl = 'xmlns:' . $decl unless $decl =~ /xmlns:/;
 
-    $me->{_namespaces}->{$decl} = $uri;
+    return $me->{'_namespaces'}->{$decl} = $uri;
 }
 
 # -------------------------------------------------------------------------- #
@@ -202,10 +214,12 @@ sub _initNS {
 
     $namespaces ||= {};
 
-    $me->addNamespace( $namespaces->{$_},     $_ ) for keys %$namespaces;
+    $me->addNamespace( $namespaces->{$_},     $_ ) for keys %{$namespaces};
     $me->addNamespace( $BASIC_NAMESPACES{$_}, $_ ) for keys %BASIC_NAMESPACES;
     $me->addNamespace( $me->targetNS, $IMPL_NS_DECL );
     $me->addNamespace( $me->targetNS, $TARGET_NS_DECL );
+
+    return;
 }
 
 sub _initSource {
@@ -226,32 +240,40 @@ sub _initSource {
     while ( $contents =~ /$WSDL_METHOD_REGEXP_FOR/g ) {
         $me->_parseMethodPod( $2, $1 );
     }
+
+    return;
 }
 
 sub _initTypes {
     my $me = shift;
 
-    for my $method ( @{ $me->{_methods} } ) {
+    for my $method ( @{ $me->{'_methods'} } ) {
         for my $param ( @{ $method->params }, $method->return ) {
             next unless $param;
-            unless ( exists $XSD_STANDARD_TYPE_MAP{ $param->type } ) {
+
+            if ( not exists $XSD_STANDARD_TYPE_MAP{ $param->type } ) {
                 $me->_addType( $param->type, $param->array );
+                next;
             }
-            elsif ( $param->array ) {
+
+            if ( $param->array ) {
 
                 #AHICOX: 10/10/2006
                 #changed to _standardTypeArrays (was singular)
-                $me->{_standardTypeArrays}->{ $param->type } = 1;
+                $me->{'_standardTypeArrays'}->{ $param->type } = 1;
+                next;
             }
+
         }
 
         for my $fault ( @{ $method->faults } ) {
-            unless ( exists $XSD_STANDARD_TYPE_MAP{ $fault->type } ) {
+            if ( not exists $XSD_STANDARD_TYPE_MAP{ $fault->type } ) {
                 $me->_addType( $fault->type, 0 );
             }
         }
     }
 
+    return;
 }
 
 sub _addType {
@@ -265,9 +287,9 @@ sub _addType {
     }
 
     my $code = $me->_getModuleCode( $name );
-    my $pod  = '';
+    my $pod  = q{};
     my $in   = $code;
-    my $out  = '';
+    my $out  = q{};
 
     # collect =begin wsdl ... =end
     while ( $code =~ /$WSDL_TYPE_REGEXP_BEG/g ) {
@@ -281,30 +303,35 @@ sub _addType {
 
     warn "No pod wsdl found for type '$name'.\n" unless $pod;
 
-    my $IN  = new IO::Scalar \$in;
-    my $OUT = new IO::Scalar \$out;
+    my $IN  = IO::Scalar->new( \$in );
+    my $OUT = IO::Scalar->new( \$out );
 
-    new Pod::Text()->parse_from_filehandle( $IN, $OUT );
+    Pod::Text->new()->parse_from_filehandle( $IN, $OUT );
 
-    $me->types->{$name} = new Pod::WSDL::Type(
-        name   => $name,
-        array  => $array,
-        pod    => $pod,
-        descr  => $out,
-        writer => $me->writer
-    );
+    $me->types->{$name} =
+        Pod::WSDL::Type->new( 'name'   => $name,
+                              'array'  => $array,
+                              'pod'    => $pod,
+                              'descr'  => $out,
+                              'writer' => $me->writer,
+        );
 
     for my $attr ( @{ $me->types->{$name}->attrs } ) {
-        unless ( exists $XSD_STANDARD_TYPE_MAP{ $attr->type } ) {
+        if ( not exists $XSD_STANDARD_TYPE_MAP{ $attr->type } ) {
             $me->_addType( $attr->type, $attr->array );
+            next;
         }
-        elsif ( $attr->array ) {
+
+        if ( $attr->array ) {
 
             #AHICOX: 10/10/2006
             #changed to _standardTypeArrays (was singular)
-            $me->{_standardTypeArrays}->{ $attr->type } = 1;
+            $me->{'_standardTypeArrays'}->{ $attr->type } = 1;
+            next;
         }
     }
+
+    return;
 }
 
 sub _parseMethodPod {
@@ -312,10 +339,11 @@ sub _parseMethodPod {
     my $methodName = shift;
     my $podData    = shift;
 
-    my $method
-        = new Pod::WSDL::Method( name => $methodName, writer => $me->writer );
+    my $method =
+        Pod::WSDL::Method->new( 'name'   => $methodName,
+                                'writer' => $me->writer );
 
-    my @data = split "\n", $podData;
+    my @data = split /\n/, $podData;
 
     # Preprocess wsdl pod: trim all lines and concatenate lines not
     # beginning with wsdl type tokens to previous line.
@@ -326,7 +354,7 @@ sub _parseMethodPod {
         {
             if ( $i > 0 ) {
                 $data[ $i - 1 ] .= " $data[$i]";
-                $data[$i] = '';
+                $data[$i] = q{};
             }
         }
     }
@@ -337,29 +365,45 @@ sub _parseMethodPod {
         s/ $//;
 
         if ( /^_(INOUT|IN|OUT)\s+/i ) {
-            my $param = new Pod::WSDL::Param( $_ );
+            my $param = Pod::WSDL::Param->new( $_ );
             $method->addParam( $param );
-            $me->standardTypeArrays->{ $param->type } = 1
-                if $param->array and $XSD_STANDARD_TYPE_MAP{ $param->type };
+
+            if ( $param->array and $XSD_STANDARD_TYPE_MAP{ $param->type } ) {
+                $me->standardTypeArrays->{ $param->type } = 1;
+            }
+
+            next;
         }
-        elsif ( /^_RETURN\s+/i ) {
-            my $return = new Pod::WSDL::Return( $_ );
+
+        if ( /^_RETURN\s+/i ) {
+            my $return = Pod::WSDL::Return->new( $_ );
             $method->return( $return );
-            $me->standardTypeArrays->{ $return->type } = 1
-                if $return->array and $XSD_STANDARD_TYPE_MAP{ $return->type };
+
+            if ( $return->array and $XSD_STANDARD_TYPE_MAP{ $return->type } ) {
+                $me->standardTypeArrays->{ $return->type } = 1;
+            }
+            next;
         }
-        elsif ( /^_DOC\s+/i ) {
-            $method->doc( new Pod::WSDL::Doc( $_ ) );
+
+        if ( /^_DOC\s+/i ) {
+            $method->doc( Pod::WSDL::Doc->new( $_ ) );
+            next;
         }
-        elsif ( /^_FAULT\s+/i ) {
-            $method->addFault( new Pod::WSDL::Fault( $_ ) );
+
+        if ( /^_FAULT\s+/i ) {
+            $method->addFault( Pod::WSDL::Fault->new( $_ ) );
+            next;
         }
-        elsif ( /^_ONEWAY\s*$/i ) {
+
+        if ( /^_ONEWAY\s*$/i ) {
             $method->oneway( 1 );
+            next;
         }
     }
 
-    push @{ $me->{_methods} }, $method;
+    push @{ $me->{'_methods'} }, $method;
+
+    return;
 }
 
 sub _getModuleCode {
@@ -406,10 +450,11 @@ sub _getModuleCode {
     }
 
     if ( $moduleFile ) {
-        open IN, $moduleFile or die "Could not open $moduleFile, died";
+        open( my $IN, q{<}, $moduleFile )
+            or croak "Could not open $moduleFile, died";
         local $/ = undef;
-        my $contents = <IN>;
-        close IN;
+        my $contents = <$IN>;
+        close $IN || warn "unable to close $moduleFile: $!\n";
         $me->_setTargetNS( $contents ) if $findNS;
 
         ##AHICOX: 10/12/2006
@@ -424,10 +469,10 @@ sub _getModuleCode {
         return ( $baseName, $contents );
     }
 
-    die
+    croak
         "Can't find any file '$src' and can't locate it as a module in \@INC either (\@INC contains "
-        . join( " ", @INC )
-        . "), died";
+        . join( q{ }, @INC )
+        . '), died';
 }
 
 sub _setTargetNS {
@@ -442,10 +487,13 @@ sub _setTargetNS {
         my $serverURL = $me->location;
         $serverURL =~ s!(http(s)??://[^/]*).*!$1!;
         $me->targetNS( "$serverURL/$tmp" );
+
+        return;
     }
-    else {
-        $me->targetNS( $me->location );
-    }
+
+    $me->targetNS( $me->location );
+
+    return;
 }
 
 # -------------------------------------------------------------------------- #
@@ -460,27 +508,26 @@ sub _writeTypes {
 
     $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:types' );
     $me->writer->wrElem(
-        $START_PREFIX_NAME, 'schema',
-        targetNamespace => $me->namespaces->{ 'xmlns:' . $TARGET_NS_DECL },
-        xmlns           => "http://www.w3.org/2001/XMLSchema"
+           $START_PREFIX_NAME, 'schema',
+           'targetNamespace' => $me->namespaces->{ 'xmlns:' . $TARGET_NS_DECL },
+           'xmlns'           => 'http://www.w3.org/2001/XMLSchema'
     );
-    $me->writer->wrElem( $EMPTY_PREFIX_NAME, "import",
-        namespace => "http://schemas.xmlsoap.org/soap/encoding/" );
+    $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'import',
+                   'namespace' => 'http://schemas.xmlsoap.org/soap/encoding/' );
 
     for my $type ( sort keys %{ $me->standardTypeArrays } ) {
-        $me->writer->wrElem( $START_PREFIX_NAME, "complexType",
-            name => $ARRAY_PREFIX_NAME . ucfirst $type );
-        $me->writer->wrElem( $START_PREFIX_NAME, "complexContent" );
-        $me->writer->wrElem( $START_PREFIX_NAME, "restriction",
-            base => "soapenc:Array" );
-        $me->writer->wrElem(
-            $EMPTY_PREFIX_NAME, "attribute",
-            ref              => "soapenc:arrayType",
-            "wsdl:arrayType" => 'soapenc:' . $type . '[]'
+        $me->writer->wrElem( $START_PREFIX_NAME, 'complexType',
+                             'name' => $ARRAY_PREFIX_NAME . ucfirst $type );
+        $me->writer->wrElem( $START_PREFIX_NAME, 'complexContent' );
+        $me->writer->wrElem( $START_PREFIX_NAME, 'restriction',
+                             'base' => 'soapenc:Array' );
+        $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'attribute',
+                             'ref'            => 'soapenc:arrayType',
+                             'wsdl:arrayType' => 'soapenc:' . $type . '[]'
         );
-        $me->writer->wrElem( $END_PREFIX_NAME, "restriction" );
-        $me->writer->wrElem( $END_PREFIX_NAME, "complexContent" );
-        $me->writer->wrElem( $END_PREFIX_NAME, "complexType" );
+        $me->writer->wrElem( $END_PREFIX_NAME, 'restriction' );
+        $me->writer->wrElem( $END_PREFIX_NAME, 'complexContent' );
+        $me->writer->wrElem( $END_PREFIX_NAME, 'complexType' );
     }
 
     for my $type ( values %{ $me->types } ) {
@@ -496,35 +543,38 @@ sub _writeTypes {
     $me->writer->wrElem( $END_PREFIX_NAME, 'schema' );
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:types' );
     $me->writer->wrNewLine;
+
+    return;
 }
 
 sub _writePortType {
     my $me = shift;
 
     $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:portType',
-        name => $me->baseName . $PORT_TYPE_SUFFIX_NAME );
+                         'name' => $me->baseName . $PORT_TYPE_SUFFIX_NAME );
 
-    for my $method ( @{ $me->{_methods} } ) {
+    for my $method ( @{ $me->{'_methods'} } ) {
         $method->writePortTypeOperation;
         $me->writer->wrNewLine;
     }
 
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:portType' );
     $me->writer->wrNewLine( 1 );
+
+    return;
 }
 
 sub _writeBinding {
     my $me = shift;
 
     $me->writer->wrElem(
-        $START_PREFIX_NAME, 'wsdl:binding',
-        name => $me->baseName . $BINDING_SUFFIX_NAME,
-        type => $IMPL_NS_DECL . ':' . $me->baseName . $PORT_TYPE_SUFFIX_NAME
+         $START_PREFIX_NAME, 'wsdl:binding',
+         'name' => $me->baseName . $BINDING_SUFFIX_NAME,
+         'type' => $IMPL_NS_DECL . q{:} . $me->baseName . $PORT_TYPE_SUFFIX_NAME
     );
-    $me->writer->wrElem(
-        $EMPTY_PREFIX_NAME, "wsdlsoap:binding",
-        style     => $me->style,
-        transport => "http://schemas.xmlsoap.org/soap/http"
+    $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdlsoap:binding',
+                         'style'     => $me->style,
+                         'transport' => 'http://schemas.xmlsoap.org/soap/http',
     );
     $me->writer->wrNewLine;
 
@@ -535,24 +585,31 @@ sub _writeBinding {
 
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:binding' );
     $me->writer->wrNewLine;
+
+    return;
 }
 
 sub _writeService {
     my $me = shift;
 
     $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:service',
-        name => $me->baseName . $PORT_TYPE_SUFFIX_NAME . $SERVICE_SUFFIX_NAME );
-    $me->writer->wrElem(
-        $START_PREFIX_NAME, 'wsdl:port',
-        binding => $IMPL_NS_DECL . ':' . $me->baseName . $BINDING_SUFFIX_NAME,
-        name    => $me->baseName
+                               'name' => $me->baseName
+                             . $PORT_TYPE_SUFFIX_NAME
+                             . $SERVICE_SUFFIX_NAME );
+    $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:port',
+                         'binding' => $IMPL_NS_DECL . q{:}
+                             . $me->baseName
+                             . $BINDING_SUFFIX_NAME,
+                         'name' => $me->baseName
     );
-    $me->writer->wrElem( $EMPTY_PREFIX_NAME, "wsdlsoap:address",
-        location => $me->location );
+    $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdlsoap:address',
+                         'location' => $me->location );
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:port' );
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:service' );
 
     $me->writer->wrNewLine;
+
+    return;
 }
 
 1;
