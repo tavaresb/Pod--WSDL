@@ -23,21 +23,21 @@ our %FORBIDDEN_METHODS = ( 'name'     => { 'get' => 1, 'set' => 0 },
 sub new {
     my ( $pkg, %data ) = @_;
 
-    croak 'A type needs a name, died' unless $data{name};
+    croak 'A type needs a name, died' unless $data{'name'};
 
-    my $wsdlName = $data{name};
+    my $wsdlName = $data{'name'};
     $wsdlName =~ s/(?:^|::)(.)/uc $1/eg;
 
-    my $me = bless { '_name'     => $data{name},
+    my $me = bless { '_name'     => $data{'name'},
                      '_wsdlName' => ucfirst $wsdlName,
-                     '_array'    => $data{array} || 0,
+                     '_array'    => $data{'array'} || 0,
                      '_attrs'    => [],
-                     '_descr'    => $data{descr} || q{},
-                     '_writer'   => $data{writer},
+                     '_descr'    => $data{'descr'} || q{},
+                     '_writer'   => $data{'writer'},
                      '_reftype'  => 'HASH',
     }, $pkg;
 
-    $me->_initPod( $data{pod} ) if $data{pod};
+    $me->_initPod( $data{'pod'} ) if $data{'pod'};
 
     return $me;
 }
@@ -67,7 +67,7 @@ sub _initPod {
         s/ $//;
 
         if ( /^\s*_ATTR\s+/i ) {
-            push @{ $me->{_attrs} }, Pod::WSDL::Attr->new( $_ );
+            push @{ $me->{'_attrs'} }, Pod::WSDL::Attr->new( $_ );
         }
         elsif ( /^\s*_REFTYPE\s+(HASH|ARRAY)/i ) {
             $me->reftype( uc $1 );
@@ -130,7 +130,7 @@ sub writeComplexType {
                              'base' => 'soapenc:Array' );
         $me->writer->wrElem(
                $EMPTY_PREFIX_NAME, 'attribute',
-               ref              => 'soapenc:arrayType',
+               'ref'            => 'soapenc:arrayType',
                'wsdl:arrayType' => $TARGET_NS_DECL . q{:} . $me->wsdlName . '[]'
         );
         $me->writer->wrElem( $END_PREFIX_NAME, 'restriction' );

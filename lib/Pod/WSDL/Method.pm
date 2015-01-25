@@ -16,7 +16,6 @@ use Pod::WSDL::Utils qw(:writexml :namespaces :messages);
 
 use Carp;
 
-
 our $EMPTY_MESSAGE_NAME   = 'empty';
 our $REQUEST_SUFFIX_NAME  = 'Request';
 our $RESPONSE_SUFFIX_NAME = 'Response';
@@ -38,18 +37,19 @@ sub new {
     croak 'A method needs a name, died' unless defined $data{'name'};
 
     croak 'A method needs a writer, died'
-        unless defined $data{writer}
-        and ref $data{writer} eq 'Pod::WSDL::Writer';
+        unless defined $data{'writer'}
+        and ref $data{'writer'} eq 'Pod::WSDL::Writer';
 
-    return bless { '_name'                => $data{'name'},
-            '_params'              => $data{'params'} || [],
-            '_return'              => $data{'return'},
-            '_doc'                 => $data{'doc'} || Pod::WSDL::Doc->new( '_DOC' ),
-            '_faults'              => $data{'faults'} || [],
-            '_oneway'              => $data{'oneWay'} || 0,
-            '_writer'              => $data{'writer'},
-            '_emptyMessageWritten' => 0,
-    }, $pkg;
+    return
+        bless { '_name'   => $data{'name'},
+                '_params' => $data{'params'} || [],
+                '_return' => $data{'return'},
+                '_doc'    => $data{'doc'} || Pod::WSDL::Doc->new( '_DOC' ),
+                '_faults' => $data{'faults'} || [],
+                '_oneway' => $data{'oneWay'} || 0,
+                '_writer' => $data{'writer'},
+                '_emptyMessageWritten' => 0,
+        }, $pkg;
 }
 
 sub addParam {
@@ -79,13 +79,14 @@ sub writeMessages {
     $me->_writeMessageRequestElem( $types, $style, $wrapped );
     $me->writer->wrNewLine;
 
-    unless ( $me->oneway ) {
+    if ( !$me->oneway ) {
+
         if ( $me->return ) {
             $me->_writeMessageResponseElem( $types, $style, $wrapped );
             $me->writer->wrNewLine;
         }
         else {
-            unless ( $me->writer->emptyMessageWritten ) {
+            if ( !$me->writer->emptyMessageWritten ) {
                 $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdl:message',
                                      'name' => $EMPTY_MESSAGE_NAME );
                 $me->writer->registerWrittenEmptyMessage;
@@ -109,10 +110,10 @@ sub writePortTypeOperation {
     my $me = shift;
 
     my $name       = $me->name;
-    my $paramOrder = '';
+    my $paramOrder = q{};
 
     for my $param ( @{ $me->params } ) {
-        $paramOrder .= $param->name . ' ';
+        $paramOrder .= $param->name . q{ };
     }
 
     $paramOrder =~ s/\s+$//;
@@ -125,26 +126,27 @@ sub writePortTypeOperation {
     my @p_order = $paramOrder ? ( 'parameterOrder', $paramOrder ) : ();
 
     $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:operation',
-                         name => $name,
+                         'name' => $name,
                          @p_order
     );
     $me->writer->wrDoc( $me->doc->descr );
     $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdl:input',
-                         message => "$IMPL_NS_DECL:$inputName",
-                         name    => $inputName
+                         'message' => "$IMPL_NS_DECL:$inputName",
+                         'name'    => $inputName,
     );
 
     # if method has no return, we treat it as one-way operation
-    unless ( $me->oneway ) {
+    if ( !$me->oneway ) {
+
         if ( $me->return ) {
             $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdl:output',
-                                 message => "$IMPL_NS_DECL:$outputName",
-                                 name    => $outputName
+                                 'message' => "$IMPL_NS_DECL:$outputName",
+                                 'name'    => $outputName,
             );
         }
         else {
             $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdl:output',
-                               message => "$IMPL_NS_DECL:$EMPTY_MESSAGE_NAME" );
+                             'message' => "$IMPL_NS_DECL:$EMPTY_MESSAGE_NAME" );
         }
     }
 
@@ -202,6 +204,8 @@ sub _writeMessageRequestElem {
     }
 
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:message' );
+
+    return;
 }
 
 sub _writeMessageResponseElem {
@@ -211,12 +215,12 @@ sub _writeMessageResponseElem {
     my $wrapped = shift;
 
     $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:message',
-                         name => $me->responseName );
+                         'name' => $me->responseName );
 
     if ( $wrapped ) {
         $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdl:part',
-                             name    => 'parameters',
-                             element => $me->responseName
+                             'name'    => 'parameters',
+                             'element' => $me->responseName,
         );
     }
     else {
@@ -241,6 +245,8 @@ sub _writeMessageResponseElem {
     }
 
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:message' );
+
+    return;
 }
 
 sub _writeMessageFaultElem {
@@ -249,18 +255,20 @@ sub _writeMessageFaultElem {
     my $style   = shift;
     my $wrapped = shift;
 
-    my %attrs = ( name => $FAULT_NAME );
+    my %attrs = ( 'name' => $FAULT_NAME );
 
     if ( $style eq $RPC_STYLE ) {
-        $attrs{type} = "$TARGET_NS_DECL:$name";
+        $attrs{'type'} = "$TARGET_NS_DECL:$name";
     }
     elsif ( $style eq $DOCUMENT_STYLE ) {
-        $attrs{element} = $name . $MESSAGE_PART;
+        $attrs{'element'} = $name . $MESSAGE_PART;
     }
 
-    $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:message', name => $name );
+    $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:message', 'name' => $name );
     $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdl:part', %attrs );
     $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:message' );
+
+    return;
 }
 
 sub _writePartElem {
@@ -273,14 +281,14 @@ sub _writePartElem {
     my $isReturn = shift;
     my $ownType  = shift;
 
-    my %attrs = ( name => $name );
+    my %attrs = ( 'name' => $name );
 
     if ( $style eq $RPC_STYLE ) {
-        $attrs{type}
+        $attrs{'type'}
             = Pod::WSDL::Utils::getTypeDescr( $type, $array, $ownType );
     }
     elsif ( $style eq $DOCUMENT_STYLE ) {
-        $attrs{element}
+        $attrs{'element'}
             = ( $isReturn ? lcfirst $RETURN_SUFFIX_NAME : $name )
             . $PART_IN
             . ucfirst $me->requestName;
@@ -295,6 +303,8 @@ sub _writePartElem {
     else {
         $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdl:part', %attrs );
     }
+
+    return;
 }
 
 sub writeBindingOperation {
@@ -302,46 +312,48 @@ sub writeBindingOperation {
     my $location = shift;
     my $use      = shift;
 
-    $me->writer->wrElem( $START_PREFIX_NAME, "wsdl:operation",
-                         name => $me->name );
-    $me->writer->wrElem( $EMPTY_PREFIX_NAME, "wsdlsoap:operation",
-                         soapAction => "" );
-    $me->writer->wrElem( $START_PREFIX_NAME, "wsdl:input",
-                         name => $me->requestName );
+    $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:operation',
+                         'name' => $me->name );
+    $me->writer->wrElem( $EMPTY_PREFIX_NAME, 'wsdlsoap:operation',
+                         'soapAction' => q{} );
+    $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:input',
+                         'name' => $me->requestName );
     $me->writer->wrElem(
-                   $EMPTY_PREFIX_NAME, "wsdlsoap:body",
-                   encodingStyle => "http://schemas.xmlsoap.org/soap/encoding/",
-                   namespace     => $location,
-                   use           => $use
+                 $EMPTY_PREFIX_NAME, 'wsdlsoap:body',
+                 'encodingStyle' => 'http://schemas.xmlsoap.org/soap/encoding/',
+                 'namespace'     => $location,
+                 'use'           => $use,
     );
-    $me->writer->wrElem( $END_PREFIX_NAME, "wsdl:input" );
+    $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:input' );
 
-    unless ( $me->oneway ) {
-        $me->writer->wrElem( $START_PREFIX_NAME, "wsdl:output",
-                name => $me->return ? $me->responseName : $EMPTY_MESSAGE_NAME );
+    if ( !$me->oneway ) {
+        $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:output',
+              'name' => $me->return ? $me->responseName : $EMPTY_MESSAGE_NAME );
         $me->writer->wrElem(
-                   $EMPTY_PREFIX_NAME, "wsdlsoap:body",
-                   encodingStyle => "http://schemas.xmlsoap.org/soap/encoding/",
-                   namespace     => $location,
-                   use           => $use
+                 $EMPTY_PREFIX_NAME, 'wsdlsoap:body',
+                 'encodingStyle' => 'http://schemas.xmlsoap.org/soap/encoding/',
+                 'namespace'     => $location,
+                 'use'           => $use,
         );
-        $me->writer->wrElem( $END_PREFIX_NAME, "wsdl:output" );
+        $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:output' );
     }
 
     for my $fault ( @{ $me->faults } ) {
-        $me->writer->wrElem( $START_PREFIX_NAME, "wsdl:fault",
-                             name => $fault->wsdlName );
+        $me->writer->wrElem( $START_PREFIX_NAME, 'wsdl:fault',
+                             'name' => $fault->wsdlName );
         $me->writer->wrElem(
-                   $EMPTY_PREFIX_NAME, "wsdlsoap:fault",
-                   name          => $fault->wsdlName,
-                   encodingStyle => "http://schemas.xmlsoap.org/soap/encoding/",
-                   namespace     => $location,
-                   use           => $use
+                 $EMPTY_PREFIX_NAME, 'wsdlsoap:fault',
+                 'name'          => $fault->wsdlName,
+                 'encodingStyle' => 'http://schemas.xmlsoap.org/soap/encoding/',
+                 'namespace'     => $location,
+                 'use'           => $use,
         );
-        $me->writer->wrElem( $END_PREFIX_NAME, "wsdl:fault" );
+        $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:fault' );
     }
 
-    $me->writer->wrElem( $END_PREFIX_NAME, "wsdl:operation" );
+    $me->writer->wrElem( $END_PREFIX_NAME, 'wsdl:operation' );
+
+    return;
 }
 
 sub writeDocumentStyleSchemaElements {
@@ -350,17 +362,18 @@ sub writeDocumentStyleSchemaElements {
 
     for my $param ( @{ $me->params } ) {
         $me->writer->wrElem(
-                     $EMPTY_PREFIX_NAME,
-                     'element',
-                     name => $param->name . $PART_IN . ucfirst $me->requestName,
-                     type =>
-                         Pod::WSDL::Utils::getTypeDescr(
+                   $EMPTY_PREFIX_NAME,
+                   'element',
+                   'name' => $param->name . $PART_IN . ucfirst $me->requestName,
+                   'type' =>
+                       Pod::WSDL::Utils::getTypeDescr(
                            $param->type, $param->array, $types->{ $param->type }
-                         )
+                       )
         );
     }
 
     for my $fault ( @{ $me->faults } ) {
+
         next
             if $me->writer->faultMessageWritten(
                                              $fault->wsdlName . $MESSAGE_PART );
@@ -370,27 +383,29 @@ sub writeDocumentStyleSchemaElements {
 
         $me->writer->wrElem( $EMPTY_PREFIX_NAME,
                              'element',
-                             name => $fault->wsdlName . $MESSAGE_PART,
-                             type =>
+                             'name' => $fault->wsdlName . $MESSAGE_PART,
+                             'type' =>
                                  Pod::WSDL::Utils::getTypeDescr(
                                        $fault->type, 0, $types->{ $fault->type }
                                  )
         );
     }
 
-    if ( !$me->oneway and $me->return ) {
+    if ( not $me->oneway and $me->return ) {
         $me->writer->wrElem( $EMPTY_PREFIX_NAME,
                              'element',
-                             name => lcfirst $RETURN_SUFFIX_NAME
+                             'name' => lcfirst $RETURN_SUFFIX_NAME
                                  . $PART_IN
                                  . ucfirst $me->requestName,
-                             type =>
+                             'type' =>
                                  Pod::WSDL::Utils::getTypeDescr(
                                  $me->return->type, $me->return->array,
                                  $types->{ $me->return->type }
                                  )
         );
     }
+
+    return;
 }
 1;
 __END__

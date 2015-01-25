@@ -49,7 +49,7 @@ sub AUTOLOAD {
     if (     ( caller )[0] ne ref( $me )
          and %{$fbd}
          and $fbd->{$attr}
-         and ( not $fbd->{$attr}->{get} ) ) {
+         and ( not $fbd->{$attr}->{'get'} ) ) {
         croak ref( $me ) . " does not allow getting of '$attr', died";
     }
 

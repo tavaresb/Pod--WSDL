@@ -20,8 +20,8 @@ sub new {
 
     my $outStr = q{};
 
-    my $me = bless { '_pretty'              => $data{pretty},
-                     '_withDocumentation'   => $data{withDocumentation},
+    my $me = bless { '_pretty'              => $data{'pretty'},
+                     '_withDocumentation'   => $data{'withDocumentation'},
                      '_outStr'              => \$outStr,
                      '_writer'              => undef,
                      '_indent'              => 1,
@@ -205,7 +205,7 @@ sub AUTOLOAD {
     }
 
     no strict 'refs';
-    return $me->{_writer}->$method( @_ );
+    return $me->{'_writer'}->$method( @_ );
 }
 
 1;

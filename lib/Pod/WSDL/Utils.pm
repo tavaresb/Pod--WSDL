@@ -7,13 +7,13 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
-    writexml => [qw($END_PREFIX_NAME $START_PREFIX_NAME $EMPTY_PREFIX_NAME)],
-    namespaces =>
+    'writexml' => [qw($END_PREFIX_NAME $START_PREFIX_NAME $EMPTY_PREFIX_NAME)],
+    'namespaces' =>
         [qw(%BASIC_NAMESPACES $DEFAULT_NS_DECL $TARGET_NS_DECL $IMPL_NS_DECL)],
-    messages => [
+    'messages' => [
         qw($REQUEST_SUFFIX_NAME $RESPONSE_SUFFIX_NAME $RETURN_SUFFIX_NAME $EMPTY_MESSAGE_NAME $DOCUMENT_STYLE $RPC_STYLE $LITERAL_USE $ENCODED_USE $PART_IN $FAULT_NAME $MESSAGE_PART)
     ],
-    types => [qw($ARRAY_PREFIX_NAME %XSD_STANDARD_TYPE_MAP)],
+    'types' => [qw($ARRAY_PREFIX_NAME %XSD_STANDARD_TYPE_MAP)],
 );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'writexml'} },
