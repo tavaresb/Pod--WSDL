@@ -5,35 +5,35 @@ package Pod::WSDL::Fault;
 use strict;
 use warnings;
 
-use Pod::WSDL::AUTOLOAD;
+use base 'Pod::WSDL::AUTOLOAD';
 
-our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
+use Carp;
 
-our %FORBIDDEN_METHODS = (
-    type     => { get => 1, set => 0 },
-    descr    => { get => 1, set => 0 },
-    wsdlName => { get => 1, set => 0 },
+our %FORBIDDEN_METHODS = ( 'type'     => { 'get' => 1, 'set' => 0 },
+                           'descr'    => { 'get' => 1, 'set' => 0 },
+                           'wsdlName' => { 'get' => 1, 'set' => 0 },
 );
 
 sub new {
     my ( $pkg, $str ) = @_;
 
-    $str ||= '';    # avoid warnings here, will die soon
+    $str ||= q{};    # avoid warnings here, will die soon
     $str =~ s/^\s*_FAULT\s*//i
-        or die
-        "_FAULT statements must have structure '_FAULT <type> <text>', like '_FAULT My::Fault This is my documentation'";
+        or croak
+        q{_FAULT statements must have structure '_FAULT <type> <text>', like '_FAULT My::Fault This is my documentation'};
+
     my ( $type, $descr ) = split /\s+/, $str, 2;
 
     my $wsdlName = $type;
     $wsdlName =~ s/::(.)/uc $1/eg;
 
-    $descr ||= '';
+    $descr ||= q{};
 
-    bless {
-        _type     => $type,
-        _descr    => $descr,
-        _wsdlName => ucfirst $wsdlName,
-    }, $pkg;
+    return
+        bless { '_type'     => $type,
+                '_descr'    => $descr,
+                '_wsdlName' => ucfirst $wsdlName,
+        }, $pkg;
 }
 
 1;

@@ -2,31 +2,29 @@ package Pod::WSDL::Attr;
 
 # ABSTRACT: Represents the WSDL pod for an attribute of a class (internal use only)
 
-
 use strict;
 use warnings;
-use Pod::WSDL::AUTOLOAD;
+use base 'Pod::WSDL::AUTOLOAD';
 
-our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
+use Carp;
 
-our %FORBIDDEN_METHODS = (
-    name     => { get => 1, set => 0 },
-    type     => { get => 1, set => 0 },
-    nillable => { get => 1, set => 0 },
-    descr    => { get => 1, set => 0 },
-    array    => { get => 1, set => 0 },
+our %FORBIDDEN_METHODS = ( 'name'     => { 'get' => 1, 'set' => 0 },
+                           'type'     => { 'get' => 1, 'set' => 0 },
+                           'nillable' => { 'get' => 1, 'set' => 0 },
+                           'descr'    => { 'get' => 1, 'set' => 0 },
+                           'array'    => { 'get' => 1, 'set' => 0 },
 );
 
 sub new {
     my ( $pkg, $str ) = @_;
 
-    defined $str or $str = '';    # avoids warnings
+    defined $str or $str = q{};    # avoids warnings
     $str =~ s/\s*_ATTR\s*//i
-        or die "Input string '$str' does not begin with '_ATTR'";
+        or croak "Input string '$str' does not begin with '_ATTR'";
 
     my ( $name, $type, $needed, $descr ) = split /\s+/, $str, 4;
 
-    $descr ||= '';
+    $descr ||= q{};
 
     if ( ( uc $needed ) ne '_NEEDED' ) {
         $descr  = "$needed $descr";
@@ -36,17 +34,18 @@ sub new {
         $needed = 1;
     }
 
-    $type =~ /([\$\@])(.*)/;
-    die "Type '$type' must be prefixed with either '\$' or '\@', died"
-        unless $1;
+    if ( $type !~ /([\$\@])(.*)/ ) {
+        croak "Type '$type' must be prefixed with either '\$' or '\@', ddieied";
+    }
+    my ( $arrob, $the_type ) = ( $1, $2 );
 
-    bless {
-        _name     => $name,
-        _type     => $2,
-        _nillable => $needed ? undef : 'true',
-        _descr    => $descr,
-        _array    => $1 eq '@' ? 1 : 0,
-    }, $pkg;
+    return
+        bless { '_name'     => $name,
+                '_type'     => $the_type,
+                '_nillable' => $needed ? undef : 'true',
+                '_descr'    => $descr,
+                '_array'    => $arrob eq q{@} ? 1 : 0,
+        }, $pkg;
 }
 
 1;

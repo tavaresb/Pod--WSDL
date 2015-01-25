@@ -5,19 +5,19 @@ package Pod::WSDL::Doc;
 use strict;
 use warnings;
 
-use Pod::WSDL::AUTOLOAD;
-
-our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
+use base 'Pod::WSDL::AUTOLOAD';
+use Carp;
 
 sub new {
     my ( $pkg, $str ) = @_;
 
-    defined $str or $str = '';    # avoids warnings
-    $str =~ /\s*_DOC\s*(.*)/
-        or die
-        "_DOC statements must have structure '_DOC <text>', like '_DOC This is my documentation'";
+    $str ||= q{};    # avoids warnings
+    if ( $str !~ /\s*_DOC\s*(.*)/ ) {
+        carp
+            q{_DOC statements must have structure '_DOC <text>', like '_DOC This is my documentation'};
+    }
 
-    bless { _descr => $1 || '', }, $pkg;
+    return bless { '_descr' => $1 || q{} }, $pkg;
 }
 
 1;

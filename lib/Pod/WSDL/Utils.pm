@@ -1,10 +1,11 @@
 package Pod::WSDL::Utils;
+
 # ABSTRACT:  Utilities and constants for Pod::WSDL (internal use only)
 use strict;
 use warnings;
 require Exporter;
 
-our @ISA         = qw(Exporter);
+our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
     writexml => [qw($END_PREFIX_NAME $START_PREFIX_NAME $EMPTY_PREFIX_NAME)],
     namespaces =>
@@ -15,11 +16,10 @@ our %EXPORT_TAGS = (
     types => [qw($ARRAY_PREFIX_NAME %XSD_STANDARD_TYPE_MAP)],
 );
 
-our @EXPORT_OK = (
-    @{ $EXPORT_TAGS{writexml} },
-    @{ $EXPORT_TAGS{namespaces} },
-    @{ $EXPORT_TAGS{messages} },
-    @{ $EXPORT_TAGS{types} }
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'writexml'} },
+                   @{ $EXPORT_TAGS{'namespaces'} },
+                   @{ $EXPORT_TAGS{'messages'} },
+                   @{ $EXPORT_TAGS{'types'} },
 );
 
 # writexml
@@ -108,11 +108,11 @@ sub getTypeDescr {
     my $array    = shift;
     my $ownType  = shift;
 
-    if (    ( defined $typeName )
-        and ( exists $XSD_STANDARD_TYPE_MAP{$typeName} ) ) {
+    if (     ( defined $typeName )
+         and ( exists $XSD_STANDARD_TYPE_MAP{$typeName} ) ) {
         if ( $array ) {
             return
-                  $TARGET_NS_DECL . ':'
+                  $TARGET_NS_DECL . q{:}
                 . $ARRAY_PREFIX_NAME
                 . ucfirst $typeName;
         }
@@ -121,11 +121,10 @@ sub getTypeDescr {
 
     if ( defined $ownType ) {
         return
-            $TARGET_NS_DECL . ':'
-            . (
-              $array
-            ? $ARRAY_PREFIX_NAME . ucfirst $ownType->wsdlName
-            : $ownType->wsdlName
+            $TARGET_NS_DECL . q{:'}
+            . (   $array
+                ? $ARRAY_PREFIX_NAME . ucfirst $ownType->wsdlName
+                : $ownType->wsdlName
             );
     }
     return;

@@ -1,37 +1,39 @@
 package Pod::WSDL::Return;
+
 # ABSTRACT: Represents the WSDL pod for the return value of a method (internal use only)
 
 use strict;
 use warnings;
-use Pod::WSDL::AUTOLOAD;
+use base 'Pod::WSDL::AUTOLOAD';
 
-our @ISA     = qw/Pod::WSDL::AUTOLOAD/;
+use Carp;
 
-our %FORBIDDEN_METHODS = (
-    type  => { get => 1, set => 0 },
-    array => { get => 1, set => 0 },
-    descr => { get => 1, set => 0 },
+our %FORBIDDEN_METHODS = ( 'type'  => { 'get' => 1, 'set' => 0 },
+                           'array' => { 'get' => 1, 'set' => 0 },
+                           'descr' => { 'get' => 1, 'set' => 0 },
 );
 
 sub new {
     my ( $pkg, $str ) = @_;
 
-    defined $str or $str = '';    # avoids warnings, dies soon
+    $str ||= q{};    # avoids warnings, dies soon
     $str =~ s/\s*_RETURN\s*//i;
     my ( $type, $descr ) = split /\s+/, $str, 2;
 
-    $type ||= '';                 # avoids warnings, dies soon
+    $type ||= q{};    # avoids warnings, dies soon
 
-    $type =~ /([\$\@])(.+)/;
-    die
-        "Type '$type' must have structure (\$|\@)<typename>, e.g. '\$boolean' or '\@string', died"
-        unless $1 and $2;
+    if ( $type !~ /([\$\@])(.+)/ ) {
+        croak q{Type '} . $type
+            . q{' must have structure ($|@)<typename>, e.g. '$boolean' or '@string', died };
+    }
+    my $the_type   = $2;
+    my $array_char = $1;
 
-    bless {
-        _type  => $2,
-        _descr => $descr || '',
-        _array => $1 eq '@' ? 1 : 0,
-    }, $pkg;
+    return
+        bless { '_type'  => $the_type,
+                '_descr' => $descr || q{},
+                '_array' => $array_char eq q{@} ? 1 : 0,
+        }, $pkg;
 }
 
 1;

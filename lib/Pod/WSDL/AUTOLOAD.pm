@@ -1,4 +1,5 @@
 package Pod::WSDL::AUTOLOAD;
+
 # ABSTRACT:  Base class for autoloading (internal use only)
 
 use Carp;
@@ -19,10 +20,10 @@ sub AUTOLOAD {
     if ( @_ ) {
         croak ref $me
             . " received call to '$attr' with too many params (max 1). Call was '$attr($param, "
-            . join( ", ", @_ ) . ")'!";
+            . join( q{, }, @_ ) . q{)'!};
     }
 
-    if ( $attr eq "DESTROY" ) {
+    if ( $attr eq 'DESTROY' ) {
         return;
     }
 
@@ -33,21 +34,24 @@ sub AUTOLOAD {
     no strict 'refs';
     if ( defined $param ) {
 
-        croak ref( $me ) . " does not allow setting of '$attr', died"
-            if ( caller )[0] ne ref( $me )
-            and %$fbd
-            and $fbd->{$attr}
-            and !$fbd->{$attr}->{set};
+        if (     ( caller )[0] ne ref( $me )
+             and %{$fbd}
+             and $fbd->{$attr}
+             and ( not $fbd->{$attr}->{'set'} ) ) {
 
-        $me->{ '_' . $attr } = $param;
+            croak ref( $me ) . " does not allow setting of '$attr', died";
+        }
+
+        $me->{ q{_} . $attr } = $param;
         return $me;
     }
 
-    croak ref( $me ) . " does not allow getting of '$attr', died"
-        if ( caller )[0] ne ref( $me )
-        and %$fbd
-        and $fbd->{$attr}
-        and !$fbd->{$attr}->{get};
+    if (     ( caller )[0] ne ref( $me )
+         and %{$fbd}
+         and $fbd->{$attr}
+         and ( not $fbd->{$attr}->{get} ) ) {
+        croak ref( $me ) . " does not allow getting of '$attr', died";
+    }
 
     #if (ref $me->{'_' . $attr} eq 'ARRAY') {
     #    return @{$me->{'_' . $attr}};
