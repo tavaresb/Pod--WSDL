@@ -13,7 +13,7 @@ To install this module type the following:
 SYNOPSIS
       use Pod::WSDL;
 
-    my $pod = new Pod::WSDL(
+    my $pod = Pod::WSDL->new(
         source            => 'My::Server',
         location          => 'http://localhost/My/Server',
         pretty            => 1,
@@ -28,7 +28,7 @@ DESCRIPTION - How to use Pod::WSDL
     name of the module (or the path of the file, or an open filehandle)
     providing the web service like this
 
-    my $pwsdl = new Pod::WSDL(
+    my $pwsdl = Pod::WSDL->new(
         source   => 'My::Module',
         location => 'http://my.services.location/on/the/web',
     );
