@@ -4,13 +4,11 @@ use strict;
 use warnings;
 
 package Foo;
-use Pod::WSDL::AUTOLOAD;
-
-our @ISA = qw/Pod::WSDL::AUTOLOAD/;
+use base 'Pod::WSDL::AUTOLOAD';
 
 sub new {
     my $pgk = shift;
-    bless { '_bar' => 'blah', }, $pgk;
+    return bless { '_bar' => 'blah', }, $pgk;
 }
 
 1;
@@ -20,7 +18,7 @@ use Test::More 'tests' => 3;
 
 my $foo = Foo->new;
 ok( $foo->bar eq 'blah', '"_bar" retrievable with "bar".' );
-$foo->bar('bloerch');    # sets _bar to 'bloerch'
+$foo->bar( 'bloerch' );    # sets _bar to 'bloerch'
 ok( $foo->bar eq 'bloerch', '"_bar" settable with "bar".' );
 
 eval { $foo->boerk; };

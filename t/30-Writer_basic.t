@@ -9,7 +9,7 @@ BEGIN { use_ok('Pod::WSDL::Writer') }
 # ****************************************************************
 # test constructor()
 
-my $wr = new Pod::WSDL::Writer( 'pretty' => 1, 'withDocumentation' => 1 );
+my $wr = Pod::WSDL::Writer->new( 'pretty' => 1, 'withDocumentation' => 1 );
 
 ok( $wr->{'_pretty'} == 1, 'Constructor: Read argument pretty correctly.' );
 
@@ -35,7 +35,7 @@ ok(
 $wr->startTag('bla');
 $wr->wrNewLine();
 $wr->endTag('bla');
-my $expectedOutput = <<EOU;
+my $expectedOutput = <<'EOU';
 <?xml version="1.0" encoding="UTF-8"?>
 <bla>
 </bla>
@@ -44,18 +44,18 @@ ok( $wr->output . "\n" eq $expectedOutput, 'wrNewLine works.' );
 
 # ****************************************************************
 # test wrElem()
-$wr = new Pod::WSDL::Writer();
-$wr->wrElem( 'empty', 'foo', bar => 1, bloerch => 'ggg' );
-$expectedOutput = <<EOU;
+$wr = Pod::WSDL::Writer->new();
+$wr->wrElem( 'empty', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
+$expectedOutput = <<'EOU';
 <?xml version="1.0" encoding="UTF-8"?>
 <foo bar="1" bloerch="ggg" />
 EOU
 ok( $wr->output . "\n" eq $expectedOutput, 'Writing empty elements works.' );
 
-$wr = new Pod::WSDL::Writer();
-$wr->wrElem( 'start', 'foo', bar => 1, bloerch => 'ggg' );
-$wr->wrElem( 'end',   'foo', bar => 1, bloerch => 'ggg' );
-$expectedOutput = <<EOU;
+$wr = Pod::WSDL::Writer->new();
+$wr->wrElem( 'start', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
+$wr->wrElem( 'end',   'foo', 'bar' => 1, 'bloerch' => 'ggg' );
+$expectedOutput = <<'EOU';
 <?xml version="1.0" encoding="UTF-8"?>
 <foo bar="1" bloerch="ggg"></foo>
 EOU
@@ -64,21 +64,21 @@ ok( $wr->output . "\n" eq $expectedOutput,
 
 # ****************************************************************
 # test wrDoc()
-$wr = new Pod::WSDL::Writer( withDocumentation => 1 );
-$wr->wrElem( 'start', 'foo', bar => 1, bloerch => 'ggg' );
+$wr = Pod::WSDL::Writer->new( 'withDocumentation' => 1 );
+$wr->wrElem( 'start', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
 $wr->wrDoc('This is my documentation.');
-$wr->wrElem( 'end', 'foo', bar => 1, bloerch => 'ggg' );
-$expectedOutput = <<EOU;
+$wr->wrElem( 'end', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
+$expectedOutput = <<'EOU';
 <?xml version="1.0" encoding="UTF-8"?>
 <foo bar="1" bloerch="ggg"><wsdl:documentation>This is my documentation.</wsdl:documentation></foo>
 EOU
 ok( $wr->output . "\n" eq $expectedOutput, 'wrDoc works.' );
 
-$wr = new Pod::WSDL::Writer( withDocumentation => 0 );
-$wr->wrElem( 'start', 'foo', bar => 1, bloerch => 'ggg' );
+$wr = Pod::WSDL::Writer->new( 'withDocumentation' => 0 );
+$wr->wrElem( 'start', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
 $wr->wrDoc('This is my documentation.');
-$wr->wrElem( 'end', 'foo', bar => 1, bloerch => 'ggg' );
-$expectedOutput = <<EOU;
+$wr->wrElem( 'end', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
+$expectedOutput = <<'EOU';
 <?xml version="1.0" encoding="UTF-8"?>
 <foo bar="1" bloerch="ggg"></foo>
 EOU
@@ -89,23 +89,23 @@ ok(
 
 # ****************************************************************
 # test withDocumentation()
-$wr = new Pod::WSDL::Writer( withDocumentation => 1 );
+$wr = Pod::WSDL::Writer->new( 'withDocumentation' => 1 );
 $wr->withDocumentation(0);
-$wr->wrElem( 'start', 'foo', bar => 1, bloerch => 'ggg' );
+$wr->wrElem( 'start', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
 $wr->wrDoc('This is my documentation.');
-$wr->wrElem( 'end', 'foo', bar => 1, bloerch => 'ggg' );
-$expectedOutput = <<EOU;
+$wr->wrElem( 'end', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
+$expectedOutput = <<'EOU';
 <?xml version="1.0" encoding="UTF-8"?>
 <foo bar="1" bloerch="ggg"></foo>
 EOU
 ok( $wr->output . "\n" eq $expectedOutput, 'wrDoc works.' );
 
-$wr = new Pod::WSDL::Writer( withDocumentation => 0 );
+$wr = Pod::WSDL::Writer->new( 'withDocumentation' => 0 );
 $wr->withDocumentation(1);
-$wr->wrElem( 'start', 'foo', bar => 1, bloerch => 'ggg' );
+$wr->wrElem( 'start', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
 $wr->wrDoc('This is my documentation.');
-$wr->wrElem( 'end', 'foo', bar => 1, bloerch => 'ggg' );
-$expectedOutput = <<EOU;
+$wr->wrElem( 'end', 'foo', 'bar' => 1, 'bloerch' => 'ggg' );
+$expectedOutput = <<'EOU';
 <?xml version="1.0" encoding="UTF-8"?>
 <foo bar="1" bloerch="ggg"><wsdl:documentation>This is my documentation.</wsdl:documentation></foo>
 EOU

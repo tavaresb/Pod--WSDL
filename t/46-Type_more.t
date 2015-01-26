@@ -12,11 +12,11 @@ my $attrData;
     $attrData = <DATA>;
 }
 
-eval { my $a1 = new Pod::WSDL::Type(); };
+eval { my $a1 = Pod::WSDL::Type->new(); };
 
 ok( defined $@, 'new dies, if it does not get a name parameter' );
 
-my $a1 = new Pod::WSDL::Type(
+my $a1 = Pod::WSDL::Type->new(
     'name'  => 'my::foo',
     'array' => 1,
     'descr' => 'blah ...',
@@ -32,10 +32,10 @@ ok( ( $a1->attrs )->[0]->name eq '_ID',                     '... yes' );
 ok( ( $a1->attrs )->[0]->type eq 'string',                  '... yes' );
 ok( ( $a1->attrs )->[3]->descr eq 'Additional information', '... indeed' );
 
-$a1 = new Pod::WSDL::Type( 'name' => 'My::foo' );
+$a1 = Pod::WSDL::Type->new( 'name' => 'My::foo' );
 
 ok( $a1->array == 0,  'Default for array works' );
-ok( $a1->descr eq '', 'Handling lack of description works' );
+ok( $a1->descr eq q{}, 'Handling lack of description works' );
 
 eval { $a1->name('bar'); };
 

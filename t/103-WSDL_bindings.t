@@ -7,7 +7,7 @@ use warnings;
 use Test::More 'tests' => 15;
 
 BEGIN { use_ok('Pod::WSDL'); }
-use lib length $0 > 13 ? substr $0, 0, length($0) - 19 : '.';
+use lib length $0 > 13 ? substr $0, 0, length($0) - 19 : q{.};
 use XML::XPath;
 
 my $p = Pod::WSDL->new(

@@ -7,11 +7,11 @@ package Pod::WSDL;
 use Test::More 'tests' => 23;
 BEGIN { use_ok('Pod::WSDL'); }
 
-use lib length $0 > 15 ? substr $0, 0, length($0) - 21 : '.';
+use lib length $0 > 15 ? substr $0, 0, length($0) - 21 : q{.};
 
 use XML::XPath;
 
-my $p = new Pod::WSDL(
+my $p = Pod::WSDL->new(
     'source'            => 'My::OperationTest',
     'location'          => 'http://localhost/My/OperationTest',
     'pretty'            => 1,

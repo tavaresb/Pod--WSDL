@@ -5,61 +5,56 @@ use strict;
 use warnings;
 
 use Test::More 'tests' => 33;
-BEGIN { use_ok('Pod::WSDL'); }
+BEGIN { use_ok( 'Pod::WSDL' ); }
 
 # 11WSDL01basic.t
 # 100-WSDL_basic.t
 
-use lib length $0 > 11 ? substr $0, 0, length($0) - 17 : '.';
+use lib length $0 > 11 ? substr $0, 0, length( $0 ) - 17 : q{.};
 
 use XML::XPath;
 use Test::XML;
 
-eval { new Pod::WSDL( source => 'bla' ); };
+eval { Pod::WSDL->new( 'source' => 'bla' ); };
 
 ok( $@ =~ /I need a location/, 'new dies, if it does not get a location' );
 
-eval { new Pod::WSDL( location => 'bla' ); };
+eval { Pod::WSDL->new( 'location' => 'bla' ); };
 
 ok( $@ =~ /I need a file or module name or a filehandle, died/,
     'new dies, if it does not get a source' );
 
-my $p = new Pod::WSDL(
-    'source'            => 'My::Server',
-    'location'          => 'http://localhost/My/Server',
-    'pretty'            => 1,
-    'withDocumentation' => 1,
+my $p = Pod::WSDL->new( 'source'            => 'My::Server',
+                        'location'          => 'http://localhost/My/Server',
+                        'pretty'            => 1,
+                        'withDocumentation' => 1,
 );
 
-ok( $p->writer->{_pretty}, 'Received pretty argument correctly' );
-ok( $p->writer->{_withDocumentation},
+ok( $p->writer->{'_pretty'}, 'Received pretty argument correctly' );
+ok( $p->writer->{'_withDocumentation'},
     'Received withDocumentation argument correctly' );
-ok(
-    $p->location eq 'http://localhost/My/Server',
-    'Received location argument correctly'
-);
-ok( $p->{_source} eq 'My::Server', 'Received source argument correctly' );
-ok( $p->{_baseName} eq 'MyServer', 'Generated base name argument correctly' );
+ok( $p->location eq 'http://localhost/My/Server',
+    'Received location argument correctly' );
+ok( $p->{'_source'} eq 'My::Server', 'Received source argument correctly' );
+ok( $p->{'_baseName'} eq 'MyServer', 'Generated base name argument correctly' );
 
-$p->location('http://localhost/My/Other/Server');
+$p->location( 'http://localhost/My/Other/Server' );
 ok( $p->location eq 'http://localhost/My/Other/Server',
     'Setting location works' );
 
 ok( $p->namespaces->{'xmlns:impl'} eq 'http://localhost/My/Server',
     'Generated xmlns:impl namespace correctly' );
 
-ok(
-    $p->namespaces->{'xmlns:wsdlsoap'} eq
-      'http://schemas.xmlsoap.org/wsdl/soap/',
+ok( $p->namespaces->{'xmlns:wsdlsoap'} eq
+        'http://schemas.xmlsoap.org/wsdl/soap/',
     'Generated xmlns:soap namespace correctly'
 );
 
 ok( $p->namespaces->{'xmlns:wsdl'} eq 'http://schemas.xmlsoap.org/wsdl/',
     'Generated xmlns:wsdl namespace correctly' );
 
-ok(
-    $p->namespaces->{'xmlns:soapenc'} eq
-      'http://schemas.xmlsoap.org/soap/encoding/',
+ok( $p->namespaces->{'xmlns:soapenc'} eq
+        'http://schemas.xmlsoap.org/soap/encoding/',
     'Generated xmlns:soapenc namespace correctly'
 );
 
@@ -69,100 +64,84 @@ ok( $p->namespaces->{'xmlns:xsd'} eq 'http://www.w3.org/2001/XMLSchema',
 ok( $p->namespaces->{'xmlns:tns1'} eq 'http://localhost/My/Server',
     'Generated xmlns:tns1 namespace correctly' );
 
-ok(
-    ref $p->writer->{_outStr} eq 'XML::Writer::_String',
-    'Initialized outStr for writer correctly.'
-);
+ok( ref $p->writer->{'_outStr'} eq 'XML::Writer::_String',
+    'Initialized outStr for writer correctly.' );
 
-ok(
-    ref $p->writer->{_writer} eq 'XML::Writer',
-    'Found an XML::Writer for output'
-);
+ok( ref $p->writer->{'_writer'} eq 'XML::Writer',
+    'Found an XML::Writer for output' );
 
-ok( ref $p->generateNS eq 'CODE', 'Initialized generateNS correctly' );
-ok( $p->writer->{_indent} == 1,   'Initialized indentation correctly' );
-ok( $p->writer->{_lastTag} eq '', 'Initialized lastTag correctly' );
+ok( ref $p->generateNS eq 'CODE',    'Initialized generateNS correctly' );
+ok( $p->writer->{'_indent'} == 1,    'Initialized indentation correctly' );
+ok( $p->writer->{'_lastTag'} eq q{}, 'Initialized lastTag correctly' );
 
 my $loc = $p->location;
-ok(
-    $p->WSDL =~
-m#<!-- WSDL for $loc created by Pod::WSDL version: $Pod::WSDL::VERSION on .*? -->#,
+ok( $p->WSDL
+        =~ m#<!-- WSDL for $loc created by Pod::WSDL version: $Pod::WSDL::VERSION on .*? -->#,
     'Generated comment correctly'
 );
 
 # arguments of method WSDL()
-$p = new Pod::WSDL(
-    'source'            => 'My::OperationTest',
-    'location'          => 'http://localhost/My/OperationTest',
-    'pretty'            => 1,
-    'withDocumentation' => 1,
+$p = Pod::WSDL->new( 'source'            => 'My::OperationTest',
+                     'location'          => 'http://localhost/My/OperationTest',
+                     'pretty'            => 1,
+                     'withDocumentation' => 1,
 );
-my $xp = XML::XPath->new( xml => $p->WSDL );
-ok(
-    $xp->exists(
-'/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/annotation/documentation'
+my $xp = XML::XPath->new( 'xml' => $p->WSDL );
+ok( $xp->exists(
+        '/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/annotation/documentation'
     ),
     'Found documentation in schema part (complexType).'
 );
-ok(
-    $xp->exists(
-'/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/sequence/element[@name="_bar"]/annotation/documentation'
+ok( $xp->exists(
+        '/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/sequence/element[@name="_bar"]/annotation/documentation'
     ),
     'Found documentation in schema part (element).'
 );
-ok(
-    $xp->exists(
-'/wsdl:definitions/wsdl:portType[@name="MyOperationTestHandler"]/wsdl:operation[@name="testGeneral"]/wsdl:documentation'
+ok( $xp->exists(
+        '/wsdl:definitions/wsdl:portType[@name="MyOperationTestHandler"]/wsdl:operation[@name="testGeneral"]/wsdl:documentation'
     ),
     'Found documentation in operation part.'
 );
 
 #print $p->WSDL;
 
-$xp = XML::XPath->new( xml => $p->WSDL( withDocumentation => 0 ) );
-ok(
-    !$xp->exists(
-'/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/annotation/documentation'
+$xp = XML::XPath->new( 'xml' => $p->WSDL( 'withDocumentation' => 0 ) );
+ok( !$xp->exists(
+        '/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/annotation/documentation'
     ),
-'Switched off documentation -> did not find documentation in schema part (complexType).'
+    'Switched off documentation -> did not find documentation in schema part (complexType).'
 );
-ok(
-    !$xp->exists(
-'/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/sequence/element[@name="_bar"]/annotation/documentation'
+ok( !$xp->exists(
+        '/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/sequence/element[@name="_bar"]/annotation/documentation'
     ),
-'Switched off documentation -> did not find documentation in schema part (element).'
+    'Switched off documentation -> did not find documentation in schema part (element).'
 );
-ok(
-    !$xp->exists(
-'/wsdl:definitions/wsdl:portType[@name="MyOperationTestHandler"]/wsdl:operation[@name="testGeneral"]/wsdl:documentation'
+ok( !$xp->exists(
+        '/wsdl:definitions/wsdl:portType[@name="MyOperationTestHandler"]/wsdl:operation[@name="testGeneral"]/wsdl:documentation'
     ),
-'Switched off documentation -> did not find documentation in operation part.'
+    'Switched off documentation -> did not find documentation in operation part.'
 );
 
-$xp = XML::XPath->new( xml => $p->WSDL( withDocumentation => 1 ) );
-ok(
-    $xp->exists(
-'/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/annotation/documentation'
+$xp = XML::XPath->new( 'xml' => $p->WSDL( 'withDocumentation' => 1 ) );
+ok( $xp->exists(
+        '/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/annotation/documentation'
     ),
     'Found documentation in schema part (complexType).'
 );
-ok(
-    $xp->exists(
-'/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/sequence/element[@name="_bar"]/annotation/documentation'
+ok( $xp->exists(
+        '/wsdl:definitions/wsdl:types/schema/complexType[@name="MyFoo"]/sequence/element[@name="_bar"]/annotation/documentation'
     ),
     'Found documentation in schema part (element).'
 );
-ok(
-    $xp->exists(
-'/wsdl:definitions/wsdl:portType[@name="MyOperationTestHandler"]/wsdl:operation[@name="testGeneral"]/wsdl:documentation'
+ok( $xp->exists(
+        '/wsdl:definitions/wsdl:portType[@name="MyOperationTestHandler"]/wsdl:operation[@name="testGeneral"]/wsdl:documentation'
     ),
     'Found documentation in operation part.'
 );
 
-$p = new Pod::WSDL(
-    'source'   => 'My::Server',
-    'location' => 'http://localhost/My/Server',
-    'pretty'   => 1,
+$p = Pod::WSDL->new( 'source'   => 'My::Server',
+                     'location' => 'http://localhost/My/Server',
+                     'pretty'   => 1,
 );
 
 my $outputtestFile = $0;
@@ -172,14 +151,15 @@ my $outputtest;
 
 {
     $/ = undef;
-    open TEST, "$outputtestFile" or die "Could not open $outputtestFile";
-    $outputtest = <TEST>;
-    close TEST;
+    open( my $TEST, q{<}, $outputtestFile )
+        or die "Could not open $outputtestFile";
+    $outputtest = <$TEST>;
+    close $TEST;
 }
 
 my $tmp = $p->WSDL;
 $tmp =~ s/<!-- WSDL.*?-->\n//;
-is_xml( $outputtest, $tmp, "Pretty works." );
+is_xml( $outputtest, $tmp, 'Pretty works.' );
 
 $outputtestFile = $0;
 $outputtestFile =~ s![^/]+$!outputtest002.xml!;
@@ -188,17 +168,18 @@ my $outputtest2;
 
 {
     $/ = undef;
-    open TEST, "$outputtestFile" or die "Could not open $outputtestFile";
-    $outputtest2 = <TEST>;
-    close TEST;
+    open( my $TEST, q{<}, $outputtestFile )
+        or die "Could not open $outputtestFile";
+    $outputtest2 = <$TEST>;
+    close $TEST;
 }
 
-$tmp = $p->WSDL( pretty => 0 );
+$tmp = $p->WSDL( 'pretty' => 0 );
 $tmp =~ s/<!-- WSDL.*?-->\n//;
 
 #print "--->$tmp<---\n";
-is_xml( $outputtest2, $tmp, "Switch pretty off works." );
+is_xml( $outputtest2, $tmp, 'Switch pretty off works.' );
 
-$tmp = $p->WSDL( pretty => 1 );
+$tmp = $p->WSDL( 'pretty' => 1 );
 $tmp =~ s/<!-- WSDL.*?-->\n//;
-is_xml( $outputtest, $tmp, "Switch pretty on works." );
+is_xml( $outputtest, $tmp, 'Switch pretty on works.' );

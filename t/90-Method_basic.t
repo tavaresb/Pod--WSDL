@@ -16,36 +16,36 @@ use Pod::WSDL::Writer;
 
 my $m;
 
-eval { $m = new Pod::WSDL::Method( writer => 1 ); };
+eval { $m = Pod::WSDL::Method->new( 'writer' => 1 ); };
 ok( $@ =~ /a method needs a name/i, 'new dies, if it does not get a name' );
 
-eval { $m = new Pod::WSDL::Method( name => 'bla' ); };
+eval { $m = Pod::WSDL::Method->new( 'name' => 'bla' ); };
 ok( $@ =~ /a method needs a writer/i, 'new dies, if it does not get a writer' );
 
-my $ret1 = new Pod::WSDL::Return('_RETURN $string This returns blah ...');
-my $ret2 = new Pod::WSDL::Return('_RETURN $boolean This returns blah blah ...');
-my $doc1 = new Pod::WSDL::Doc('_DOC This method is for blah ...');
-my $doc2 = new Pod::WSDL::Doc('_DOC This method is for blah blah ...');
+my $ret1 = Pod::WSDL::Return->new('_RETURN $string This returns blah ...');
+my $ret2 = Pod::WSDL::Return->new('_RETURN $boolean This returns blah blah ...');
+my $doc1 = Pod::WSDL::Doc->new('_DOC This method is for blah ...');
+my $doc2 = Pod::WSDL::Doc->new('_DOC This method is for blah blah ...');
 
 my $par1 =
-  new Pod::WSDL::Param('_IN myParam $string This parameter is for blah ...');
+  Pod::WSDL::Param->new('_IN myParam $string This parameter is for blah ...');
 
 my $par2 =
-  new Pod::WSDL::Param('_OUT yourParam $string This parameter is for blah ...');
+  Pod::WSDL::Param->new('_OUT yourParam $string This parameter is for blah ...');
 
 my $fau1 =
-  new Pod::WSDL::Fault('_FAULT My::Fault This happens if something happens');
+  Pod::WSDL::Fault->new('_FAULT My::Fault This happens if something happens');
 
 my $fau2 =
-  new Pod::WSDL::Fault('_FAULT My::Fault This happens if nothing happens');
+  Pod::WSDL::Fault->new('_FAULT My::Fault This happens if nothing happens');
 
-$m = new Pod::WSDL::Method(
-    'name'   => "myMethod",
+$m = Pod::WSDL::Method->new(
+    'name'   => 'myMethod',
     'return' => $ret1,
     'doc'    => $doc1,
     'params' => [$par1],
     'faults' => [$fau1],
-    'writer' => new Pod::WSDL::Writer,
+    'writer' => Pod::WSDL::Writer->new,
 );
 
 ok( $m->name eq 'myMethod', 'Retrieving name works' );
