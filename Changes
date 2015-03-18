@@ -7,6 +7,7 @@ Revision history for Perl extension Pod::WSDL.
         - indirect new() syntax corrected
         - some postfix checks changes to prefix checks
         - unless blocks changed to if blocks
+    - JCOP Cleanup distribution erros, using dzil
 
 
 0.063 18 Jan 2014
